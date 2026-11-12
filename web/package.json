@@ -9,7 +9,7 @@
     "lint": "oxlint --deny-warnings",
     "api": "curl -sf http://localhost:8080/v3/api-docs -o ../api/openapi.json && orval",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "vitest run --dir src",
     "e2e": "playwright test"
   },
   "dependencies": {
