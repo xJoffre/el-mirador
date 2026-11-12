@@ -27,6 +27,19 @@ services:
       db:
         condition: service_healthy
 
+  backup:
+    build:
+      context: ..
+      dockerfile: deploy/backup.Dockerfile
+    restart: unless-stopped
+    env_file: ../.env
+    volumes:
+      - backups:/backups
+      - photos:/photos:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
   caddy:
     image: caddy:2
     restart: unless-stopped
@@ -45,5 +58,6 @@ services:
 volumes:
   db:
   photos:
+  backups:
   caddy_data:
   caddy_config:

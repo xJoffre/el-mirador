@@ -93,6 +93,9 @@ jobs:
           node scripts/smoke/orders.ts http://localhost:8080
           node scripts/smoke/invoicing.ts http://localhost:8080
 
+      - name: rush hour, 30 orders in one minute
+        run: node scripts/rush.ts http://localhost:8080 30 1
+
       - name: end to end
         working-directory: web
         run: |
@@ -117,6 +120,12 @@ jobs:
         env:
           NODE_TLS_REJECT_UNAUTHORIZED: 0
         run: node scripts/smoke/base.ts https://localhost
+
+      - name: backup and restore into a separate database
+        run: |
+          docker compose -f deploy/docker-compose.yml exec -T db psql -q -U el_mirador -d el_mirador < scripts/dev-seed/seed.sql
+          docker compose -f deploy/docker-compose.yml exec -T backup backup now
+          docker compose -f deploy/docker-compose.yml exec -T backup backup check
 
       - name: logs
         if: failure()

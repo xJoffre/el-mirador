@@ -23,3 +23,9 @@ Requisitos: Java 25, Node 24 y PostgreSQL 18.
 ## Producción
 
 En el servidor, con el `.env` completo (incluidos `DOMAIN` y la primera encargada en `FIRST_ADMIN_NAME` y `FIRST_ADMIN_PIN`): `docker compose -f deploy/docker-compose.yml up -d --build`. Caddy obtiene el certificado HTTPS solo.
+
+- **Respaldo**: el servicio `backup` guarda la base todos los días a las `BACKUP_AT` (hora UTC: `08:00` => 03:00 en Zaruma) y conserva `BACKUP_KEEP_DAYS` días. Con `BACKUP_REMOTE` (un remoto de rclone, configurado con variables `RCLONE_CONFIG_*` en el mismo `.env`) copia la base y las fotos fuera del servidor.
+- **Prueba de restauración**: `docker compose -f deploy/docker-compose.yml exec backup backup check` restaura el último respaldo en una base aparte y compara tabla por tabla (la CI lo hace en cada cambio). Para volver de verdad a un respaldo: detener `app` y correr `backup restore /backups/<archivo>.dump` en el mismo contenedor.
+- **Alertas**: `BACKUP_PING_URL` (un chequeo de healthchecks.io) avisa si un respaldo falla o no se hizo. Para saber si el sitio se cae, un monitor externo (UptimeRobot, gratis) sobre `https://<dominio>/actuator/health`.
+- **Simulacro de hora punta**: `node scripts/rush.ts https://<dominio> 30 15 staff` manda 30 pedidos en 15 minutos para que la cocina y la caja los atiendan de verdad. Con `robot-kitchen` (solo en pruebas) también los cocina y cobra.
+- **Equipo**: la guía para la capacitación y el texto de la respuesta automática de WhatsApp Business están en `docs/guia-del-equipo.md`.

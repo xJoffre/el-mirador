@@ -11,7 +11,9 @@ Sistema de pedidos del bar-restaurante El Mirador (Zaruma, Ecuador). La arquitec
 - `scripts/dev-seed/seed.sql`: la carta real y datos de prueba, solo para desarrollo. Se puede correr de nuevo: vacía y vuelve a llenar (`psql -f scripts/dev-seed/seed.sql`).
 - `scripts/error-codes.ts`: falla si un código de error que lanza el backend no tiene su texto en `errors.json` (corre en la CI).
 - `scripts/new-migration.ts`: el generador de migraciones (`node scripts/new-migration.ts <nombre-en-kebab>`). Nunca se nombra un archivo de migración a mano.
-- `deploy/`: `Dockerfile`, `docker-compose.yml` (PostgreSQL, app, Caddy) y `Caddyfile`.
+- `deploy/`: `Dockerfile`, `docker-compose.yml` (PostgreSQL, app, respaldo y Caddy), `Caddyfile`, y `backup.sh` con su `backup.Dockerfile`: `daily` (el servicio), `now`, `check` (restaura el último respaldo en una base aparte y compara las filas de cada tabla con las que había al respaldar) y `restore <archivo>`. Un paso que falla corta el respaldo: nada de bucles `for` ni `$(...)` dentro de un `echo`, que se tragan el error con `set -e`.
+- `scripts/rush.ts`: el simulacro de hora punta (`node scripts/rush.ts <url> <pedidos> <minutos> [robot-kitchen|staff]`). Con `robot-kitchen` abre el local, cocina y cobra solo; con `staff` deja eso al equipo. Cada cliente deja abierto su seguimiento por SSE. La CI lo corre con 30 pedidos en un minuto.
+- `docs/guia-del-equipo.md`: la guía para capacitar al equipo y el texto de la respuesta automática de WhatsApp Business. Se actualiza cuando cambia algo que el equipo ve.
 
 ## Configuración
 
