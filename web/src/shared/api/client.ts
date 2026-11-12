@@ -4,4 +4,225 @@
  * El Mirador
  * OpenAPI spec version: 1
  */
+export type CategoryName = {[key: string]: string};
 
+export type OptionItemName = {[key: string]: string};
+
+export interface OptionItem {
+  id: number;
+  name: OptionItemName;
+  sold_out: boolean;
+}
+
+export type OptionGroupName = {[key: string]: string};
+
+export interface OptionGroup {
+  id: number;
+  items: OptionItem[];
+  max_choices: number;
+  min_choices: number;
+  name: OptionGroupName;
+}
+
+/**
+ * @nullable
+ */
+export type VariantName = {[key: string]: string} | null;
+
+export interface Variant {
+  currency: string;
+  id: number;
+  /** @nullable */
+  name: VariantName;
+  price: number;
+}
+
+/**
+ * @nullable
+ */
+export type ProductDescription = {[key: string]: string} | null;
+
+export type ProductName = {[key: string]: string};
+
+export interface Product {
+  /** @nullable */
+  description: ProductDescription;
+  dine_in_only: boolean;
+  id: number;
+  name: ProductName;
+  option_groups: OptionGroup[];
+  /** @nullable */
+  photo: string | null;
+  sold_out: boolean;
+  variants: Variant[];
+}
+
+export interface Category {
+  icon: string;
+  id: number;
+  name: CategoryName;
+  products: Product[];
+}
+
+export type DailyDishKind = typeof DailyDishKind[keyof typeof DailyDishKind];
+
+
+export const DailyDishKind = {
+  soup: 'soup',
+  main: 'main',
+} as const;
+
+export type DailyDishName = {[key: string]: string};
+
+export interface DailyDish {
+  currency: string;
+  id: number;
+  kind: DailyDishKind;
+  name: DailyDishName;
+  price_alone: number;
+  /** @nullable */
+  price_full: number | null;
+  sold_out: boolean;
+}
+
+export interface Hours {
+  /** @nullable */
+  closes_at: string | null;
+  /** @nullable */
+  lunch_ends_at: string | null;
+  /** @nullable */
+  lunch_starts_at: string | null;
+  /** @nullable */
+  opens_at: string | null;
+}
+
+/**
+ * @nullable
+ */
+export type MenuLunchIncludes = {[key: string]: string} | null;
+
+export interface Menu {
+  categories: Category[];
+  lunch: DailyDish[];
+  /** @nullable */
+  lunch_includes: MenuLunchIncludes;
+}
+
+export type ScheduleWeek = {[key: string]: Hours};
+
+export interface StoreProfile {
+  /** @nullable */
+  address: string | null;
+  /** @nullable */
+  bank_account: string | null;
+  /** @nullable */
+  delivery_note: string | null;
+  name: string;
+  /** @nullable */
+  whatsapp: string | null;
+}
+
+export type StatusStatus = typeof StatusStatus[keyof typeof StatusStatus];
+
+
+export const StatusStatus = {
+  open: 'open',
+  delayed: 'delayed',
+  closed: 'closed',
+} as const;
+
+export interface Status {
+  /** @nullable */
+  reason: string | null;
+  status: StatusStatus;
+  /** @nullable */
+  until_at: string | null;
+  /** @nullable */
+  wait_minutes: number | null;
+}
+
+export interface Schedule {
+  lunch_now: boolean;
+  profile: StoreProfile;
+  status: Status;
+  today: Hours;
+  week: ScheduleWeek;
+}
+
+export type getMenuResponse200 = {
+  data: Menu
+  status: 200
+}
+
+export type getMenuResponseSuccess = (getMenuResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getMenuResponse = (getMenuResponseSuccess)
+
+export const getGetMenuUrl = () => {
+
+
+
+
+  return `/api/menu`
+}
+
+export const getMenu = async ( options?: RequestInit): Promise<getMenuResponse> => {
+
+  const res = await fetch(getGetMenuUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getMenuResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getMenuResponse
+}
+
+
+
+export type getScheduleResponse200 = {
+  data: Schedule
+  status: 200
+}
+
+export type getScheduleResponseSuccess = (getScheduleResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getScheduleResponse = (getScheduleResponseSuccess)
+
+export const getGetScheduleUrl = () => {
+
+
+
+
+  return `/api/schedule`
+}
+
+export const getSchedule = async ( options?: RequestInit): Promise<getScheduleResponse> => {
+
+  const res = await fetch(getGetScheduleUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getScheduleResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getScheduleResponse
+}

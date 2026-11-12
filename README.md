@@ -14,8 +14,9 @@ Requisitos: Java 25, Node 24 y PostgreSQL 18.
 
 1. Copiar `.env.example` a `.env` y completar la base de datos.
 2. Backend: `cd backend && ./mvnw spring-boot:run` (aplica las migraciones al arrancar).
-3. Web: `cd web && npm install && npm run dev` => http://localhost:5173 (las rutas `/api` van al backend).
-4. Prueba de humo: `node scripts/smoke/base.ts http://localhost:8080`.
+3. Datos de prueba con la carta real: `psql -h localhost -U el_mirador -d el_mirador -f scripts/dev-seed/seed.sql`.
+4. Web: `cd web && npm install && npm run dev` => http://localhost:5173 (las rutas `/api` van al backend).
+5. Pruebas de humo: `node scripts/smoke/base.ts` y `node scripts/smoke/menu.ts` (esta última con las variables `PG*` de psql).
 
 ## Producción
 

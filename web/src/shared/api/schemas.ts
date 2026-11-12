@@ -4,4 +4,77 @@
  * El Mirador
  * OpenAPI spec version: 1
  */
+import * as zod from 'zod';
 
+export const GetMenuResponse = zod.object({
+  "categories": zod.array(zod.object({
+  "icon": zod.string(),
+  "id": zod.int(),
+  "name": zod.record(zod.string(), zod.string()),
+  "products": zod.array(zod.object({
+  "description": zod.record(zod.string(), zod.string()).nullable(),
+  "dine_in_only": zod.boolean(),
+  "id": zod.int(),
+  "name": zod.record(zod.string(), zod.string()),
+  "option_groups": zod.array(zod.object({
+  "id": zod.int(),
+  "items": zod.array(zod.object({
+  "id": zod.int(),
+  "name": zod.record(zod.string(), zod.string()),
+  "sold_out": zod.boolean()
+})),
+  "max_choices": zod.int(),
+  "min_choices": zod.int(),
+  "name": zod.record(zod.string(), zod.string())
+})),
+  "photo": zod.string().nullable(),
+  "sold_out": zod.boolean(),
+  "variants": zod.array(zod.object({
+  "currency": zod.string(),
+  "id": zod.int(),
+  "name": zod.record(zod.string(), zod.string()).nullable(),
+  "price": zod.number()
+}))
+}))
+})),
+  "lunch": zod.array(zod.object({
+  "currency": zod.string(),
+  "id": zod.int(),
+  "kind": zod.enum(['soup', 'main']),
+  "name": zod.record(zod.string(), zod.string()),
+  "price_alone": zod.number(),
+  "price_full": zod.number().nullable(),
+  "sold_out": zod.boolean()
+})),
+  "lunch_includes": zod.record(zod.string(), zod.string()).nullable()
+})
+
+
+export const GetScheduleResponse = zod.object({
+  "lunch_now": zod.boolean(),
+  "profile": zod.object({
+  "address": zod.string().nullable(),
+  "bank_account": zod.string().nullable(),
+  "delivery_note": zod.string().nullable(),
+  "name": zod.string(),
+  "whatsapp": zod.string().nullable()
+}),
+  "status": zod.object({
+  "reason": zod.string().nullable(),
+  "status": zod.enum(['open', 'delayed', 'closed']),
+  "until_at": zod.iso.datetime({"offset":true}).nullable(),
+  "wait_minutes": zod.int().nullable()
+}),
+  "today": zod.object({
+  "closes_at": zod.iso.time({}).nullable(),
+  "lunch_ends_at": zod.iso.time({}).nullable(),
+  "lunch_starts_at": zod.iso.time({}).nullable(),
+  "opens_at": zod.iso.time({}).nullable()
+}),
+  "week": zod.record(zod.string(), zod.object({
+  "closes_at": zod.iso.time({}).nullable(),
+  "lunch_ends_at": zod.iso.time({}).nullable(),
+  "lunch_starts_at": zod.iso.time({}).nullable(),
+  "opens_at": zod.iso.time({}).nullable()
+}))
+})

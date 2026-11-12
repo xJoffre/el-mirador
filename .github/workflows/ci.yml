@@ -11,6 +11,10 @@ jobs:
       POSTGRES_DB: el_mirador
       POSTGRES_USER: el_mirador
       POSTGRES_PASSWORD: el_mirador
+      PGHOST: localhost
+      PGDATABASE: el_mirador
+      PGUSER: el_mirador
+      PGPASSWORD: el_mirador
     services:
       postgres:
         image: postgres:18
@@ -53,6 +57,12 @@ jobs:
           -Dliquibase.username=$POSTGRES_USER
           -Dliquibase.password=$POSTGRES_PASSWORD
 
+      - name: every table and column has a comment
+        run: psql -q -f scripts/smoke/comments.sql
+
+      - name: dev seed
+        run: psql -q -f scripts/dev-seed/seed.sql
+
       - name: start
         working-directory: backend
         run: |
@@ -67,7 +77,9 @@ jobs:
           test -z "$(git status --porcelain ../api src/shared/api)"
 
       - name: smoke
-        run: node scripts/smoke/base.ts http://localhost:8080
+        run: |
+          node scripts/smoke/base.ts http://localhost:8080
+          node scripts/smoke/menu.ts http://localhost:8080
 
   docker:
     runs-on: ubuntu-latest

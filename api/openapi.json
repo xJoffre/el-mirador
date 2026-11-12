@@ -7,6 +7,329 @@
   "servers" : [ {
     "url" : "/"
   } ],
-  "paths" : { },
-  "components" : { }
+  "paths" : {
+    "/api/menu" : {
+      "get" : {
+        "operationId" : "getMenu",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Menu"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "menu-controller" ]
+      }
+    },
+    "/api/schedule" : {
+      "get" : {
+        "operationId" : "getSchedule",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Schedule"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "schedule-controller" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Category" : {
+        "type" : "object",
+        "properties" : {
+          "icon" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "products" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Product"
+            }
+          }
+        },
+        "required" : [ "icon", "id", "name", "products" ]
+      },
+      "DailyDish" : {
+        "type" : "object",
+        "properties" : {
+          "currency" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "kind" : {
+            "type" : "string",
+            "enum" : [ "soup", "main" ]
+          },
+          "name" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "price_alone" : {
+            "type" : "number"
+          },
+          "price_full" : {
+            "type" : [ "number", "null" ]
+          },
+          "sold_out" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "currency", "id", "kind", "name", "price_alone", "price_full", "sold_out" ]
+      },
+      "Hours" : {
+        "type" : "object",
+        "properties" : {
+          "closes_at" : {
+            "type" : [ "string", "null" ],
+            "format" : "time-local"
+          },
+          "lunch_ends_at" : {
+            "type" : [ "string", "null" ],
+            "format" : "time-local"
+          },
+          "lunch_starts_at" : {
+            "type" : [ "string", "null" ],
+            "format" : "time-local"
+          },
+          "opens_at" : {
+            "type" : [ "string", "null" ],
+            "format" : "time-local"
+          }
+        },
+        "required" : [ "closes_at", "lunch_ends_at", "lunch_starts_at", "opens_at" ]
+      },
+      "Menu" : {
+        "type" : "object",
+        "properties" : {
+          "categories" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Category"
+            }
+          },
+          "lunch" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DailyDish"
+            }
+          },
+          "lunch_includes" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          }
+        },
+        "required" : [ "categories", "lunch", "lunch_includes" ]
+      },
+      "OptionGroup" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/OptionItem"
+            }
+          },
+          "max_choices" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "min_choices" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "name" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          }
+        },
+        "required" : [ "id", "items", "max_choices", "min_choices", "name" ]
+      },
+      "OptionItem" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "sold_out" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "id", "name", "sold_out" ]
+      },
+      "Product" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "dine_in_only" : {
+            "type" : "boolean"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "option_groups" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/OptionGroup"
+            }
+          },
+          "photo" : {
+            "type" : [ "string", "null" ]
+          },
+          "sold_out" : {
+            "type" : "boolean"
+          },
+          "variants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Variant"
+            }
+          }
+        },
+        "required" : [ "description", "dine_in_only", "id", "name", "option_groups", "photo", "sold_out", "variants" ]
+      },
+      "Schedule" : {
+        "type" : "object",
+        "properties" : {
+          "lunch_now" : {
+            "type" : "boolean"
+          },
+          "profile" : {
+            "$ref" : "#/components/schemas/StoreProfile"
+          },
+          "status" : {
+            "$ref" : "#/components/schemas/Status"
+          },
+          "today" : {
+            "$ref" : "#/components/schemas/Hours"
+          },
+          "week" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "$ref" : "#/components/schemas/Hours"
+            }
+          }
+        },
+        "required" : [ "lunch_now", "profile", "status", "today", "week" ]
+      },
+      "Status" : {
+        "type" : "object",
+        "properties" : {
+          "reason" : {
+            "type" : [ "string", "null" ]
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "open", "delayed", "closed" ]
+          },
+          "until_at" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time"
+          },
+          "wait_minutes" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          }
+        },
+        "required" : [ "reason", "status", "until_at", "wait_minutes" ]
+      },
+      "StoreProfile" : {
+        "type" : "object",
+        "properties" : {
+          "address" : {
+            "type" : [ "string", "null" ]
+          },
+          "bank_account" : {
+            "type" : [ "string", "null" ]
+          },
+          "delivery_note" : {
+            "type" : [ "string", "null" ]
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "whatsapp" : {
+            "type" : [ "string", "null" ]
+          }
+        },
+        "required" : [ "address", "bank_account", "delivery_note", "name", "whatsapp" ]
+      },
+      "Variant" : {
+        "type" : "object",
+        "properties" : {
+          "currency" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "price" : {
+            "type" : "number"
+          }
+        },
+        "required" : [ "currency", "id", "name", "price" ]
+      }
+    }
+  }
 }
