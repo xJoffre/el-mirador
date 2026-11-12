@@ -1,13 +1,24 @@
-import { MutationCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
 import { toast } from 'sonner'
 import { Home } from '@/features/site/Home'
+import { getGetSessionQueryKey } from '@/shared/api/client'
 import { errorText } from '@/shared/lib/format'
+import { ApiError } from '@/shared/lib/request'
 import { Toaster } from '@/shared/ui/sonner'
 
-const queries = new QueryClient({
-  mutationCache: new MutationCache({ onError: (error) => toast.error(errorText(error)) }),
+const sessionEnded = (error: unknown) =>
+  error instanceof ApiError && error.status === 401 && queries.invalidateQueries({ queryKey: getGetSessionQueryKey() })
+
+const queries: QueryClient = new QueryClient({
+  queryCache: new QueryCache({ onError: sessionEnded }),
+  mutationCache: new MutationCache({
+    onError: (error, _variables, _context, mutation) => {
+      sessionEnded(error)
+      if (!mutation.options.onError) toast.error(errorText(error))
+    },
+  }),
   defaultOptions: { queries: { retry: false } },
 })
 

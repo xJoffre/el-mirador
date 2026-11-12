@@ -22,6 +22,7 @@ $$;
 select pg_temp.rejects($$insert into menu_category (name, icon) values ('{"en": "Drinks"}', 'beer')$$);
 select pg_temp.rejects($$insert into menu_category (name, icon) values ('{"es": 1}', 'beer')$$);
 select pg_temp.rejects($$insert into menu_category (name, icon) values ('["Bebidas"]', 'beer')$$);
+select pg_temp.rejects($$insert into menu_category (name, icon) values ('{"es": "  "}', 'beer')$$);
 select pg_temp.rejects($$delete from menu_category where id = (select menu_category_id from product limit 1)$$);
 select pg_temp.rejects($$insert into product_variant (product_id, price, currency) values ((select min(id) from product), 1, 'usd')$$);
 select pg_temp.rejects($$insert into product_variant (product_id, price) values ((select min(id) from product), -1)$$);

@@ -3,8 +3,8 @@
 --changeset el-mirador:20261112185114-shared-types
 
 create domain localized_text as jsonb
-  check (value is null or jsonb_typeof(value -> 'es') is not distinct from 'string');
-comment on domain localized_text is 'Translatable label: a map from language code to text, Spanish (es) required as the base';
+  check (value is null or (jsonb_typeof(value -> 'es') is not distinct from 'string' and btrim(value ->> 'es') <> ''));
+comment on domain localized_text is 'Translatable label: a map from language code to text, with non-blank Spanish (es) required as the base';
 
 create domain currency_code as char(3)
   default 'USD'

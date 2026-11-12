@@ -7,7 +7,7 @@
   },
   "staff": {
     "wrongPin": "PIN incorrecto.",
-    "locked": "Demasiados intentos. Vuelve a probar a las {{until, datetime(timeStyle: short)}}.",
+    "locked": "Demasiados intentos. Podrás volver a probar a las {{until, datetime(timeStyle: short)}}",
     "signInRequired": "Tu sesión terminó. Vuelve a entrar.",
     "forbidden": "No tienes permiso para esto.",
     "staleForm": "La página quedó vieja. Vuelve a intentarlo.",
