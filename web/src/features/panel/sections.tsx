@@ -1,5 +1,6 @@
-import { BookOpen, ChefHat, CircleSlash, ClipboardList, CookingPot, Store, Sun, Users, type LucideIcon } from 'lucide-react'
+import { BookOpen, ChefHat, CircleSlash, ClipboardList, CookingPot, Store, Sun, Users, Wallet, type LucideIcon } from 'lucide-react'
 import type { ReactElement } from 'react'
+import { CashPage } from '@/features/cash/CashPage'
 import { CatalogPage } from '@/features/catalog/CatalogPage'
 import { KitchenPage } from '@/features/kitchen/KitchenPage'
 import { LunchPage } from '@/features/lunch/LunchPage'
@@ -12,7 +13,7 @@ import { SessionRole } from '@/shared/api/client'
 
 export type PanelSection = {
   path: string
-  label: 'orders' | 'kitchen' | 'today' | 'lunch' | 'catalog' | 'store' | 'users' | 'soldOut'
+  label: 'orders' | 'kitchen' | 'today' | 'lunch' | 'cash' | 'catalog' | 'store' | 'users' | 'soldOut'
   icon: LucideIcon
   roles: SessionRole[]
   element: ReactElement
@@ -25,6 +26,7 @@ export const panelSections: PanelSection[] = [
   { path: 'cocina', label: 'kitchen', icon: ChefHat, roles: [SessionRole.admin, SessionRole.kitchen], element: <KitchenPage /> },
   { path: 'hoy', label: 'today', icon: Sun, roles: [SessionRole.admin], element: <TodayPage /> },
   { path: 'almuerzo', label: 'lunch', icon: CookingPot, roles: [SessionRole.admin], element: <LunchPage /> },
+  { path: 'caja', label: 'cash', icon: Wallet, roles: [SessionRole.admin], element: <CashPage /> },
   { path: 'carta', label: 'catalog', icon: BookOpen, roles: [SessionRole.admin], element: <CatalogPage /> },
   { path: 'local', label: 'store', icon: Store, roles: [SessionRole.admin], element: <StorePage /> },
   { path: 'usuarios', label: 'users', icon: Users, roles: [SessionRole.admin], element: <UsersPage /> },

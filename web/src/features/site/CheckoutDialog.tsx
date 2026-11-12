@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import type { ResolvedLine } from '@/features/site/cart'
 import { rememberOrder, useCart } from '@/features/site/useCart'
-import { usePlaceOrder, type NewOrder } from '@/shared/api/client'
+import { InvoiceDetailsIdType, usePlaceOrder, type NewOrder } from '@/shared/api/client'
 import { PlaceOrderBody } from '@/shared/api/schemas'
 import { emptyIsNull, errorText, money } from '@/shared/lib/format'
 import { cn } from '@/shared/lib/utils'
@@ -13,6 +13,7 @@ import { Button } from '@/shared/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui/dialog'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
+import { Switch } from '@/shared/ui/switch'
 import { Textarea } from '@/shared/ui/textarea'
 
 type Props = { lines: ResolvedLine[]; total: number; currency: string; onClose: () => void }
@@ -26,7 +27,14 @@ export function CheckoutDialog({ lines, total, currency, onClose }: Props) {
   const place = usePlaceOrder({ mutation: { onError: (failure) => setError(errorText(failure)) } })
   const form = useForm<NewOrder>({
     resolver: zodResolver(PlaceOrderBody),
-    defaultValues: { customer_name: '', customer_phone: '', delivery_address: null, note: null, lines: [] },
+    defaultValues: {
+      customer_name: '',
+      customer_phone: '',
+      delivery_address: null,
+      note: null,
+      lines: [],
+      invoice: null,
+    },
   })
 
   const submit = form.handleSubmit((details) =>
@@ -55,6 +63,8 @@ export function CheckoutDialog({ lines, total, currency, onClose }: Props) {
       },
     ),
   )
+
+  const invoice = useWatch({ control: form.control, name: 'invoice' }) !== null
 
   const field = (name: 'customer_name' | 'customer_phone', text: string, hint?: string) => (
     <div className="grid gap-1.5">
@@ -104,6 +114,45 @@ export function CheckoutDialog({ lines, total, currency, onClose }: Props) {
               <Textarea id="delivery_address" required {...form.register('delivery_address', emptyIsNull)} />
               <p className="text-xs text-muted-foreground">{t('deliveryHint')}</p>
             </div>
+          )}
+          <label className="flex items-center gap-2">
+            <Switch checked={invoice} onCheckedChange={(on) => form.setValue('invoice', on ? { id_type: InvoiceDetailsIdType.cedula, id_number: '', name: '', email: '', address: null } : null)} />
+            {t('wantInvoice')}
+          </label>
+          {invoice && (
+            <fieldset className="grid gap-3 rounded-xl bg-card p-3">
+              <div className="grid gap-2" role="radiogroup" aria-label={t('idType')}>
+                <Controller
+                  control={form.control}
+                  name="invoice.id_type"
+                  render={({ field }) => (
+                    <div className="grid grid-cols-3 gap-2">
+                      {Object.values(InvoiceDetailsIdType).map((type) => (
+                        <Button key={type} type="button" role="radio" aria-checked={field.value === type} variant={field.value === type ? 'default' : 'secondary'} onClick={() => field.onChange(type)}>
+                          {t(`idTypes.${type}`)}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+                />
+              </div>
+              {(
+                [
+                  ['invoice.id_number', t('idNumber'), 'off'],
+                  ['invoice.name', t('invoiceName'), 'name'],
+                  ['invoice.email', t('invoiceEmail'), 'email'],
+                ] as const
+              ).map(([name, text, autoComplete]) => (
+                <div key={name} className="grid gap-1.5">
+                  <Label htmlFor={name}>{text}</Label>
+                  <Input id={name} required autoComplete={autoComplete} type={name === 'invoice.email' ? 'email' : 'text'} {...form.register(name)} />
+                </div>
+              ))}
+              <div className="grid gap-1.5">
+                <Label htmlFor="invoice.address">{t('invoiceAddress')}</Label>
+                <Input id="invoice.address" autoComplete="street-address" {...form.register('invoice.address', emptyIsNull)} />
+              </div>
+            </fieldset>
           )}
           <div className="grid gap-1.5">
             <Label htmlFor="note">{t('orderNote')}</Label>

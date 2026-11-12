@@ -30,5 +30,10 @@
     "notFound": "Ese pedido no existe.",
     "notOpen": "Ese pedido ya se cerró.",
     "paymentShort": "Lo cobrado no cubre el total del pedido."
+  },
+  "invoicing": {
+    "invalidId": "Revisa el número: la cédula tiene 10 dígitos y el RUC 13.",
+    "notPaid": "Solo se anota la factura de un pedido cobrado.",
+    "badRange": "La fecha final no puede ser anterior a la inicial."
   }
 }

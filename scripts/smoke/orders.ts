@@ -1,20 +1,15 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { client, signIn } from './client.ts'
+import { client, signedIn } from './client.ts'
 import { GetMenuResponse, GetScheduleResponse, GetTrackingResponse, PlaceOrderResponse } from '../../web/src/shared/api/schemas.ts'
 
 const base = process.argv[2] ?? 'http://localhost:8080'
 
 const sql = (statement: string) => execFileSync('psql', ['-qtAc', statement], { encoding: 'utf8' }).trim()
-const staff = async (name: string, pin: string) => {
-  const call = client(base)
-  await signIn(call, name, pin)
-  return call
-}
-const manager = await staff('Encargada', '123456')
-const kitchen = await staff('Cocina', '333333')
-const waiter = await staff('Mesero', '222222')
+const manager = await signedIn(base, 'Encargada', '123456')
+const kitchen = await signedIn(base, 'Cocina', '333333')
+const waiter = await signedIn(base, 'Mesero', '222222')
 const customer = client(base)
 await customer('GET', '/api/menu')
 

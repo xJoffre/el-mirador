@@ -6,6 +6,73 @@
  */
 import * as zod from 'zod';
 
+export const IssueInvoiceParams = zod.object({
+  "id": zod.int()
+})
+
+export const issueInvoiceBodyInvoiceNumberMin = 0;
+export const issueInvoiceBodyInvoiceNumberMax = 40;
+
+
+
+export const IssueInvoiceBody = zod.object({
+  "invoice_number": zod.string().min(issueInvoiceBodyInvoiceNumberMin).max(issueInvoiceBodyInvoiceNumberMax)
+})
+
+export const IssueInvoiceResponse = zod.void()
+
+
+export const GetInvoiceRequestsParams = zod.object({
+  "since": zod.iso.date()
+})
+
+export const GetInvoiceRequestsResponseItem = zod.object({
+  "address": zod.string().nullable(),
+  "created_at": zod.iso.datetime({"offset":true}),
+  "currency": zod.string(),
+  "email": zod.string(),
+  "id": zod.int(),
+  "id_number": zod.string(),
+  "id_type": zod.enum(['cedula', 'ruc', 'passport']),
+  "invoice_number": zod.string().nullable(),
+  "name": zod.string(),
+  "order_id": zod.int(),
+  "order_status": zod.string(),
+  "total": zod.number()
+})
+export const GetInvoiceRequestsResponse = zod.array(GetInvoiceRequestsResponseItem)
+
+
+export const GetSalesQueryParams = zod.object({
+  "from": zod.iso.date(),
+  "to": zod.iso.date()
+})
+
+export const GetSalesResponseItem = zod.object({
+  "cash": zod.number(),
+  "closed_at": zod.iso.datetime({"offset":true}),
+  "currency": zod.string(),
+  "customer_name": zod.string(),
+  "email": zod.string().nullable(),
+  "id_number": zod.string().nullable(),
+  "id_type": zod.union([zod.literal('cedula'),zod.literal('ruc'),zod.literal('passport'),zod.literal(null)]).nullable(),
+  "invoice_name": zod.string().nullable(),
+  "invoice_number": zod.string().nullable(),
+  "order_id": zod.int(),
+  "total": zod.number(),
+  "transfer": zod.number()
+})
+export const GetSalesResponse = zod.array(GetSalesResponseItem)
+
+
+export const GetSalesCsvQueryParams = zod.object({
+  "from": zod.iso.date(),
+  "to": zod.iso.date()
+})
+
+export const GetSalesCsvResponse = zod.unknown()
+
+
 export const GetMenuResponse = zod.object({
   "categories": zod.array(zod.object({
   "description": zod.record(zod.string(), zod.string()).nullable(),
@@ -369,6 +436,18 @@ export const placeOrderBodyCustomerPhoneRegExp = new RegExp('[0-9]{7,15}');
 export const placeOrderBodyDeliveryAddressMin = 0;
 export const placeOrderBodyDeliveryAddressMax = 300;
 
+export const placeOrderBodyInvoiceOneAddressMin = 0;
+export const placeOrderBodyInvoiceOneAddressMax = 300;
+
+export const placeOrderBodyInvoiceOneEmailMin = 0;
+export const placeOrderBodyInvoiceOneEmailMax = 120;
+
+export const placeOrderBodyInvoiceOneIdNumberMin = 0;
+export const placeOrderBodyInvoiceOneIdNumberMax = 20;
+
+export const placeOrderBodyInvoiceOneNameMin = 0;
+export const placeOrderBodyInvoiceOneNameMax = 120;
+
 export const placeOrderBodyLinesItemNoteMin = 0;
 export const placeOrderBodyLinesItemNoteMax = 200;
 
@@ -386,6 +465,13 @@ export const PlaceOrderBody = zod.object({
   "customer_name": zod.string().min(placeOrderBodyCustomerNameMin).max(placeOrderBodyCustomerNameMax),
   "customer_phone": zod.string().regex(placeOrderBodyCustomerPhoneRegExp),
   "delivery_address": zod.string().min(placeOrderBodyDeliveryAddressMin).max(placeOrderBodyDeliveryAddressMax).nullable(),
+  "invoice": zod.union([zod.object({
+  "address": zod.string().min(placeOrderBodyInvoiceOneAddressMin).max(placeOrderBodyInvoiceOneAddressMax).nullable(),
+  "email": zod.email().min(placeOrderBodyInvoiceOneEmailMin).max(placeOrderBodyInvoiceOneEmailMax),
+  "id_number": zod.string().min(placeOrderBodyInvoiceOneIdNumberMin).max(placeOrderBodyInvoiceOneIdNumberMax),
+  "id_type": zod.enum(['cedula', 'ruc', 'passport']),
+  "name": zod.string().min(placeOrderBodyInvoiceOneNameMin).max(placeOrderBodyInvoiceOneNameMax)
+}),zod.null()]),
   "lines": zod.array(zod.object({
   "kind": zod.enum(['product', 'lunch_full', 'lunch_soup', 'lunch_main']),
   "main_dish_id": zod.int().nullable(),
@@ -431,6 +517,30 @@ export const GetKitchenResponseItem = zod.object({
 export const GetKitchenResponse = zod.array(GetKitchenResponseItem)
 
 
+export const GetPaymentsParams = zod.object({
+  "day": zod.iso.date()
+})
+
+export const GetPaymentsResponseItem = zod.object({
+  "amount": zod.number(),
+  "created_at": zod.iso.datetime({"offset":true}),
+  "currency": zod.string(),
+  "customer_name": zod.string(),
+  "id": zod.int(),
+  "method": zod.enum(['cash', 'transfer']),
+  "order_id": zod.int(),
+  "verified": zod.boolean()
+})
+export const GetPaymentsResponse = zod.array(GetPaymentsResponseItem)
+
+
+export const VerifyPaymentParams = zod.object({
+  "id": zod.int()
+})
+
+export const VerifyPaymentResponse = zod.void()
+
+
 export const FinishRoundParams = zod.object({
   "id": zod.int()
 })
@@ -446,12 +556,14 @@ export const StartRoundResponse = zod.void()
 
 
 export const GetTodayOrdersResponseItem = zod.object({
+  "cancel_reason": zod.string().nullable(),
   "created_at": zod.iso.datetime({"offset":true}),
   "currency": zod.string(),
   "customer_name": zod.string(),
   "customer_phone": zod.string(),
   "delivery_address": zod.string().nullable(),
   "id": zod.int(),
+  "invoice": zod.boolean(),
   "lines": zod.array(zod.object({
   "currency": zod.string(),
   "id": zod.int(),
@@ -479,12 +591,14 @@ export const GetTrackingParams = zod.object({
 })
 
 export const GetTrackingResponse = zod.object({
+  "cancel_reason": zod.string().nullable(),
   "created_at": zod.iso.datetime({"offset":true}),
   "currency": zod.string(),
   "customer_name": zod.string(),
   "customer_phone": zod.string(),
   "delivery_address": zod.string().nullable(),
   "id": zod.int(),
+  "invoice": zod.boolean(),
   "lines": zod.array(zod.object({
   "currency": zod.string(),
   "id": zod.int(),
@@ -504,6 +618,22 @@ export const GetTrackingResponse = zod.object({
   "state": zod.enum(['received', 'preparing', 'ready', 'delivered', 'cancelled']),
   "total": zod.number()
 })
+
+
+export const CancelOrderParams = zod.object({
+  "id": zod.int()
+})
+
+export const cancelOrderBodyReasonMin = 0;
+export const cancelOrderBodyReasonMax = 300;
+
+
+
+export const CancelOrderBody = zod.object({
+  "reason": zod.string().min(cancelOrderBodyReasonMin).max(cancelOrderBodyReasonMax)
+})
+
+export const CancelOrderResponse = zod.void()
 
 
 export const CloseOrderParams = zod.object({

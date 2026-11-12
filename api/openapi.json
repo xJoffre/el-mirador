@@ -8,6 +8,139 @@
     "url" : "/"
   } ],
   "paths" : {
+    "/api/invoicing/requests/{id}" : {
+      "put" : {
+        "operationId" : "issueInvoice",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Issue"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "invoicing-controller" ]
+      }
+    },
+    "/api/invoicing/requests/{since}" : {
+      "get" : {
+        "operationId" : "getInvoiceRequests",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "since",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/InvoiceRequest"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "invoicing-controller" ]
+      }
+    },
+    "/api/invoicing/sales" : {
+      "get" : {
+        "operationId" : "getSales",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "from",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }, {
+          "in" : "query",
+          "name" : "to",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Sale"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "invoicing-controller" ]
+      }
+    },
+    "/api/invoicing/sales.csv" : {
+      "get" : {
+        "operationId" : "getSalesCsv",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "from",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }, {
+          "in" : "query",
+          "name" : "to",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "text/csv" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "invoicing-controller" ]
+      }
+    },
     "/api/menu" : {
       "get" : {
         "operationId" : "getMenu",
@@ -608,6 +741,56 @@
         "tags" : [ "order-controller" ]
       }
     },
+    "/api/orders/payments/{day}" : {
+      "get" : {
+        "operationId" : "getPayments",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "day",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PaymentView"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "order-controller" ]
+      }
+    },
+    "/api/orders/payments/{id}/verified" : {
+      "put" : {
+        "operationId" : "verifyPayment",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "order-controller" ]
+      }
+    },
     "/api/orders/rounds/{id}/ready" : {
       "put" : {
         "operationId" : "finishRound",
@@ -690,6 +873,36 @@
               }
             },
             "description" : "OK"
+          }
+        },
+        "tags" : [ "order-controller" ]
+      }
+    },
+    "/api/orders/{id}/cancel" : {
+      "post" : {
+        "operationId" : "cancelOrder",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Cancellation"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
           }
         },
         "tags" : [ "order-controller" ]
@@ -993,6 +1206,17 @@
   },
   "components" : {
     "schemas" : {
+      "Cancellation" : {
+        "type" : "object",
+        "properties" : {
+          "reason" : {
+            "type" : "string",
+            "maxLength" : 300,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "reason" ]
+      },
       "CatalogCategory" : {
         "type" : "object",
         "properties" : {
@@ -1244,6 +1468,94 @@
           }
         },
         "required" : [ "closes_at", "lunch_ends_at", "lunch_starts_at", "opens_at" ]
+      },
+      "InvoiceDetails" : {
+        "type" : "object",
+        "properties" : {
+          "address" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 300,
+            "minLength" : 0
+          },
+          "email" : {
+            "type" : "string",
+            "format" : "email",
+            "maxLength" : 120,
+            "minLength" : 0
+          },
+          "id_number" : {
+            "type" : "string",
+            "maxLength" : 20,
+            "minLength" : 0
+          },
+          "id_type" : {
+            "type" : "string",
+            "enum" : [ "cedula", "ruc", "passport" ]
+          },
+          "name" : {
+            "type" : "string",
+            "maxLength" : 120,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "address", "email", "id_number", "id_type", "name" ]
+      },
+      "InvoiceRequest" : {
+        "type" : "object",
+        "properties" : {
+          "address" : {
+            "type" : [ "string", "null" ]
+          },
+          "created_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "currency" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "id_number" : {
+            "type" : "string"
+          },
+          "id_type" : {
+            "type" : "string",
+            "enum" : [ "cedula", "ruc", "passport" ]
+          },
+          "invoice_number" : {
+            "type" : [ "string", "null" ]
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "order_id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "order_status" : {
+            "type" : "string"
+          },
+          "total" : {
+            "type" : "number"
+          }
+        },
+        "required" : [ "address", "created_at", "currency", "email", "id", "id_number", "id_type", "invoice_number", "name", "order_id", "order_status", "total" ]
+      },
+      "Issue" : {
+        "type" : "object",
+        "properties" : {
+          "invoice_number" : {
+            "type" : "string",
+            "maxLength" : 40,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "invoice_number" ]
       },
       "KitchenTicket" : {
         "type" : "object",
@@ -1535,6 +1847,13 @@
             "maxLength" : 300,
             "minLength" : 0
           },
+          "invoice" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/InvoiceDetails"
+            }, {
+              "type" : "null"
+            } ]
+          },
           "lines" : {
             "type" : "array",
             "items" : {
@@ -1549,7 +1868,7 @@
             "minLength" : 0
           }
         },
-        "required" : [ "customer_name", "customer_phone", "delivery_address", "lines", "note" ]
+        "required" : [ "customer_name", "customer_phone", "delivery_address", "invoice", "lines", "note" ]
       },
       "NewPayment" : {
         "type" : "object",
@@ -1704,6 +2023,9 @@
       "OrderView" : {
         "type" : "object",
         "properties" : {
+          "cancel_reason" : {
+            "type" : [ "string", "null" ]
+          },
           "created_at" : {
             "type" : "string",
             "format" : "date-time"
@@ -1723,6 +2045,9 @@
           "id" : {
             "type" : "integer",
             "format" : "int64"
+          },
+          "invoice" : {
+            "type" : "boolean"
           },
           "lines" : {
             "type" : "array",
@@ -1748,7 +2073,41 @@
             "type" : "number"
           }
         },
-        "required" : [ "created_at", "currency", "customer_name", "customer_phone", "delivery_address", "id", "lines", "note", "paid", "ready_at", "state", "total" ]
+        "required" : [ "cancel_reason", "created_at", "currency", "customer_name", "customer_phone", "delivery_address", "id", "invoice", "lines", "note", "paid", "ready_at", "state", "total" ]
+      },
+      "PaymentView" : {
+        "type" : "object",
+        "properties" : {
+          "amount" : {
+            "type" : "number"
+          },
+          "created_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "currency" : {
+            "type" : "string"
+          },
+          "customer_name" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "method" : {
+            "type" : "string",
+            "enum" : [ "cash", "transfer" ]
+          },
+          "order_id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "verified" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "amount", "created_at", "currency", "customer_name", "id", "method", "order_id", "verified" ]
       },
       "Photo" : {
         "type" : "object",
@@ -1862,6 +2221,51 @@
           }
         },
         "required" : [ "category_id", "description", "dine_in_only", "hidden", "name", "option_groups", "variants" ]
+      },
+      "Sale" : {
+        "type" : "object",
+        "properties" : {
+          "cash" : {
+            "type" : "number"
+          },
+          "closed_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "currency" : {
+            "type" : "string"
+          },
+          "customer_name" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : [ "string", "null" ]
+          },
+          "id_number" : {
+            "type" : [ "string", "null" ]
+          },
+          "id_type" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "cedula", "ruc", "passport" ]
+          },
+          "invoice_name" : {
+            "type" : [ "string", "null" ]
+          },
+          "invoice_number" : {
+            "type" : [ "string", "null" ]
+          },
+          "order_id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "total" : {
+            "type" : "number"
+          },
+          "transfer" : {
+            "type" : "number"
+          }
+        },
+        "required" : [ "cash", "closed_at", "currency", "customer_name", "email", "id_number", "id_type", "invoice_name", "invoice_number", "order_id", "total", "transfer" ]
       },
       "Saved" : {
         "type" : "object",

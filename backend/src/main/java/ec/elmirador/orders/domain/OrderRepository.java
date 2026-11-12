@@ -11,6 +11,7 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -39,6 +40,10 @@ public interface OrderRepository {
 
 	void changeStatus(long orderId, String status, @Nullable String reason, long staffId);
 
+	List<PaymentView> payments(OffsetDateTime since);
+
+	boolean verifyPayment(long paymentId, long staffId);
+
 	enum LineKind {
 
 		product, lunch_full, lunch_soup, lunch_main
@@ -53,7 +58,27 @@ public interface OrderRepository {
 
 	record NewOrder(@NotBlank @Size(max = 80) String customerName, @Pattern(regexp = "[0-9]{7,15}") String customerPhone,
 			@Nullable @Size(max = 300) String deliveryAddress, @Nullable @Size(max = 300) String note,
-			@NotEmpty @Size(max = 40) List<@Valid NewLine> lines) {
+			@NotEmpty @Size(max = 40) List<@Valid NewLine> lines, @Nullable @Valid InvoiceDetails invoice) {
+	}
+
+	enum IdType {
+
+		cedula, ruc, passport
+
+	}
+
+	record InvoiceDetails(@NotNull IdType idType, @NotBlank @Size(max = 20) String idNumber, @NotBlank @Size(max = 120) String name,
+			@NotBlank @Email @Size(max = 120) String email, @Nullable @Size(max = 300) String address) {
+	}
+
+	record OrderPlaced(long orderId, InvoiceDetails invoice) {
+	}
+
+	record Cancellation(@NotBlank @Size(max = 300) String reason) {
+	}
+
+	record PaymentView(long id, long orderId, String customerName, PaymentMethod method, BigDecimal amount, String currency,
+			OffsetDateTime createdAt, boolean verified) {
 	}
 
 	record NewLine(@NotNull LineKind kind, @Nullable Long productVariantId, @Nullable List<Long> optionItemIds,
@@ -70,7 +95,7 @@ public interface OrderRepository {
 
 	record OrderView(long id, OrderState state, @Nullable String deliveryAddress, String customerName, String customerPhone,
 			@Nullable String note, BigDecimal total, String currency, BigDecimal paid, OffsetDateTime createdAt,
-			@Nullable OffsetDateTime readyAt, List<LineView> lines) {
+			@Nullable OffsetDateTime readyAt, @Nullable String cancelReason, boolean invoice, List<LineView> lines) {
 	}
 
 	record KitchenTicket(long roundId, long orderId, @Nullable String deliveryAddress, String customerName, @Nullable String note,

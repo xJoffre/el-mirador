@@ -89,5 +89,16 @@
   "payDelivery": "El repartidor te cobra el pedido más su tarifa.",
   "bankAccount": "Para transferir: {{account}}",
   "backToMenu": "Volver a la carta",
-  "orderNotFound": "No encontramos ese pedido."
+  "orderNotFound": "No encontramos ese pedido.",
+  "wantInvoice": "Quiero factura con mis datos",
+  "idType": "Tipo de identificación",
+  "idTypes": {
+    "cedula": "Cédula",
+    "ruc": "RUC",
+    "passport": "Pasaporte"
+  },
+  "idNumber": "Número",
+  "invoiceName": "Nombre o razón social",
+  "invoiceEmail": "Correo para la factura",
+  "invoiceAddress": "Dirección (opcional)"
 }

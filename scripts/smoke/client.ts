@@ -16,7 +16,7 @@ export function client(base: string) {
       if (/max-age=0/i.test(cookie)) cookies.delete(name)
       else cookies.set(name, value)
     }
-    const text = await response.text()
+    const text = new TextDecoder('utf-8', { ignoreBOM: true }).decode(await response.arrayBuffer())
     return { status: response.status, body: text && response.headers.get('content-type')?.includes('json') ? JSON.parse(text) : text }
   }
 }
@@ -26,4 +26,10 @@ export type Client = ReturnType<typeof client>
 export async function signIn(call: Client, name: string, pin: string) {
   const members: { id: number; name: string }[] = (await call('GET', '/api/staff/members')).body
   return call('POST', '/api/staff/session', { staff_id: members.find((member) => member.name === name)!.id, pin })
+}
+
+export async function signedIn(base: string, name: string, pin: string) {
+  const call = client(base)
+  await signIn(call, name, pin)
+  return call
 }

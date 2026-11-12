@@ -21,7 +21,9 @@ import ec.elmirador.orders.domain.OrderRepository.KitchenTicket;
 import ec.elmirador.orders.domain.OrderRepository.NewLine;
 import ec.elmirador.orders.domain.OrderRepository.NewOrder;
 import ec.elmirador.orders.domain.OrderRepository.NewPayment;
+import ec.elmirador.orders.domain.OrderRepository.OrderPlaced;
 import ec.elmirador.orders.domain.OrderRepository.OrderView;
+import ec.elmirador.orders.domain.OrderRepository.PaymentView;
 import ec.elmirador.orders.domain.OrderRepository.Placed;
 import ec.elmirador.schedule.domain.StoreStatus;
 import ec.elmirador.shared.ApiException;
@@ -65,6 +67,9 @@ public class OrderService {
 			}
 		}
 		var placed = orders.place(order, schedule.date(), token());
+		if (order.invoice() != null) {
+			events.publishEvent(new OrderPlaced(placed.id(), order.invoice()));
+		}
 		events.publishEvent(CHANGED);
 		return placed;
 	}
@@ -103,6 +108,27 @@ public class OrderService {
 		}
 		orders.pay(orderId, closing.payments(), staffId);
 		orders.changeStatus(orderId, "closed", null, staffId);
+		events.publishEvent(CHANGED);
+	}
+
+	@Transactional
+	public void cancel(long orderId, String reason, long staffId) {
+		var totals = orders.totals(orderId).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "orders.notFound"));
+		if (!totals.status().equals("open")) {
+			throw new ApiException(HttpStatus.CONFLICT, "orders.notOpen");
+		}
+		orders.changeStatus(orderId, "cancelled", reason.strip(), staffId);
+		events.publishEvent(CHANGED);
+	}
+
+	public List<PaymentView> payments(LocalDate day) {
+		return orders.payments(day.atStartOfDay(clock.getZone()).toOffsetDateTime());
+	}
+
+	public void verifyPayment(long paymentId, long staffId) {
+		if (!orders.verifyPayment(paymentId, staffId)) {
+			throw new ApiException(HttpStatus.NOT_FOUND, "orders.notFound");
+		}
 		events.publishEvent(CHANGED);
 	}
 

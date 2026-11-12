@@ -8,7 +8,8 @@
     "users": "Usuarios",
     "soldOut": "Agotados",
     "orders": "Pedidos",
-    "kitchen": "Cocina"
+    "kitchen": "Cocina",
+    "cash": "Caja"
   },
   "roles": {
     "admin": "Encargada",

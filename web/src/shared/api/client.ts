@@ -24,6 +24,14 @@ import type {
 } from '@tanstack/react-query';
 
 import { request } from '../lib/request';
+export interface Cancellation {
+  /**
+     * @minLength 0
+     * @maxLength 300
+     */
+  reason: string;
+}
+
 /**
  * @nullable
  */
@@ -213,6 +221,74 @@ export interface Hours {
   lunch_starts_at: string | null;
   /** @nullable */
   opens_at: string | null;
+}
+
+export type InvoiceDetailsIdType = typeof InvoiceDetailsIdType[keyof typeof InvoiceDetailsIdType];
+
+
+export const InvoiceDetailsIdType = {
+  cedula: 'cedula',
+  ruc: 'ruc',
+  passport: 'passport',
+} as const;
+
+export interface InvoiceDetails {
+  /**
+     * @minLength 0
+     * @maxLength 300
+     * @nullable
+     */
+  address: string | null;
+  /**
+     * @minLength 0
+     * @maxLength 120
+     */
+  email: string;
+  /**
+     * @minLength 0
+     * @maxLength 20
+     */
+  id_number: string;
+  id_type: InvoiceDetailsIdType;
+  /**
+     * @minLength 0
+     * @maxLength 120
+     */
+  name: string;
+}
+
+export type InvoiceRequestIdType = typeof InvoiceRequestIdType[keyof typeof InvoiceRequestIdType];
+
+
+export const InvoiceRequestIdType = {
+  cedula: 'cedula',
+  ruc: 'ruc',
+  passport: 'passport',
+} as const;
+
+export interface InvoiceRequest {
+  /** @nullable */
+  address: string | null;
+  created_at: string;
+  currency: string;
+  email: string;
+  id: number;
+  id_number: string;
+  id_type: InvoiceRequestIdType;
+  /** @nullable */
+  invoice_number: string | null;
+  name: string;
+  order_id: number;
+  order_status: string;
+  total: number;
+}
+
+export interface Issue {
+  /**
+     * @minLength 0
+     * @maxLength 40
+     */
+  invoice_number: string;
 }
 
 export type LineViewKind = typeof LineViewKind[keyof typeof LineViewKind];
@@ -407,6 +483,7 @@ export interface NewOrder {
      * @nullable
      */
   delivery_address: string | null;
+  invoice: InvoiceDetails | null;
   /**
      * @minItems 0
      * @maxItems 40
@@ -480,6 +557,8 @@ export const OrderViewState = {
 } as const;
 
 export interface OrderView {
+  /** @nullable */
+  cancel_reason: string | null;
   created_at: string;
   currency: string;
   customer_name: string;
@@ -487,6 +566,7 @@ export interface OrderView {
   /** @nullable */
   delivery_address: string | null;
   id: number;
+  invoice: boolean;
   lines: LineView[];
   /** @nullable */
   note: string | null;
@@ -495,6 +575,25 @@ export interface OrderView {
   ready_at: string | null;
   state: OrderViewState;
   total: number;
+}
+
+export type PaymentViewMethod = typeof PaymentViewMethod[keyof typeof PaymentViewMethod];
+
+
+export const PaymentViewMethod = {
+  cash: 'cash',
+  transfer: 'transfer',
+} as const;
+
+export interface PaymentView {
+  amount: number;
+  created_at: string;
+  currency: string;
+  customer_name: string;
+  id: number;
+  method: PaymentViewMethod;
+  order_id: number;
+  verified: boolean;
 }
 
 export interface Photo {
@@ -539,6 +638,38 @@ export interface ProductForm {
   option_groups: OptionGroupForm[];
   /** @minItems 1 */
   variants: VariantForm[];
+}
+
+/**
+ * @nullable
+ */
+export type SaleIdType = typeof SaleIdType[keyof typeof SaleIdType] | null;
+
+
+export const SaleIdType = {
+  cedula: 'cedula',
+  ruc: 'ruc',
+  passport: 'passport',
+} as const;
+
+export interface Sale {
+  cash: number;
+  closed_at: string;
+  currency: string;
+  customer_name: string;
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  id_number: string | null;
+  /** @nullable */
+  id_type: SaleIdType;
+  /** @nullable */
+  invoice_name: string | null;
+  /** @nullable */
+  invoice_number: string | null;
+  order_id: number;
+  total: number;
+  transfer: number;
 }
 
 export interface Saved {
@@ -664,6 +795,16 @@ export interface UserChange {
   role: UserChangeRole;
 }
 
+export type GetSalesParams = {
+  from: string;
+  to: string;
+};
+
+export type GetSalesCsvParams = {
+  from: string;
+  to: string;
+};
+
 export type ReplacePhotoBody = {
   file: Blob | File;
 };
@@ -688,6 +829,385 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getIssueInvoiceUrl = (id: number,) => {
+
+
+
+
+  return `/api/invoicing/requests/${id}`
+}
+
+export const issueInvoice = async (id: number,
+    issue: Issue, options?: Parameters<typeof request>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return request<void>(getIssueInvoiceUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(issue)
+  }
+);}
+
+
+
+
+
+export const getIssueInvoiceMutationKey = () => ['issueInvoice'] as const;
+
+export const getIssueInvoiceMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof issueInvoice>>, TError,IssueInvoiceMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof issueInvoice>>, TError,IssueInvoiceMutationVariables, TContext> => {
+
+const mutationKey = getIssueInvoiceMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof issueInvoice>>, IssueInvoiceMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  issueInvoice(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type IssueInvoiceMutationResult = NonNullable<Awaited<ReturnType<typeof issueInvoice>>>
+    export type IssueInvoiceMutationBody = Issue
+    export type IssueInvoiceMutationError = unknown
+    export type IssueInvoiceMutationVariables = {id: number;data: Issue}
+
+    export const useIssueInvoice = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof issueInvoice>>, TError,IssueInvoiceMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof issueInvoice>>,
+        TError,
+        IssueInvoiceMutationVariables,
+        TContext
+      > => {
+      return useMutation(getIssueInvoiceMutationOptions(options), queryClient);
+    }
+
+export const getGetInvoiceRequestsUrl = (since: string,) => {
+
+
+
+
+  return `/api/invoicing/requests/${since}`
+}
+
+export const getInvoiceRequests = async (since: string, options?: Parameters<typeof request>[1]): Promise<InvoiceRequest[]> => {
+
+  return request<InvoiceRequest[]>(getGetInvoiceRequestsUrl(since),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetInvoiceRequestsQueryKey = (since: string,) => {
+    return [
+    `/api/invoicing/requests/${since}`
+    ] as const;
+    }
+
+
+export const getGetInvoiceRequestsQueryOptions = <TData = Awaited<ReturnType<typeof getInvoiceRequests>>, TError = unknown>(since: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoiceRequests>>, TError, TData>>, request?: SecondParameter<typeof request>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetInvoiceRequestsQueryKey(since);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getInvoiceRequests>>> = ({ signal }) => getInvoiceRequests(since, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: since !== null && since !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getInvoiceRequests>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetInvoiceRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof getInvoiceRequests>>>
+export type GetInvoiceRequestsQueryError = unknown
+
+
+export function useGetInvoiceRequests<TData = Awaited<ReturnType<typeof getInvoiceRequests>>, TError = unknown>(
+ since: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoiceRequests>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getInvoiceRequests>>,
+          TError,
+          Awaited<ReturnType<typeof getInvoiceRequests>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetInvoiceRequests<TData = Awaited<ReturnType<typeof getInvoiceRequests>>, TError = unknown>(
+ since: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoiceRequests>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getInvoiceRequests>>,
+          TError,
+          Awaited<ReturnType<typeof getInvoiceRequests>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetInvoiceRequests<TData = Awaited<ReturnType<typeof getInvoiceRequests>>, TError = unknown>(
+ since: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoiceRequests>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetInvoiceRequests<TData = Awaited<ReturnType<typeof getInvoiceRequests>>, TError = unknown>(
+ since: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoiceRequests>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetInvoiceRequestsQueryOptions(since,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetSalesUrl = (params: GetSalesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/invoicing/sales?${stringifiedParams}` : `/api/invoicing/sales`
+}
+
+export const getSales = async (params: GetSalesParams, options?: Parameters<typeof request>[1]): Promise<Sale[]> => {
+
+  return request<Sale[]>(getGetSalesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSalesQueryKey = (params?: GetSalesParams,) => {
+    return [
+    `/api/invoicing/sales`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetSalesQueryOptions = <TData = Awaited<ReturnType<typeof getSales>>, TError = unknown>(params: GetSalesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSales>>, TError, TData>>, request?: SecondParameter<typeof request>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSalesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSales>>> = ({ signal }) => getSales(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSales>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetSalesQueryResult = NonNullable<Awaited<ReturnType<typeof getSales>>>
+export type GetSalesQueryError = unknown
+
+
+export function useGetSales<TData = Awaited<ReturnType<typeof getSales>>, TError = unknown>(
+ params: GetSalesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSales>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSales>>,
+          TError,
+          Awaited<ReturnType<typeof getSales>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSales<TData = Awaited<ReturnType<typeof getSales>>, TError = unknown>(
+ params: GetSalesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSales>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSales>>,
+          TError,
+          Awaited<ReturnType<typeof getSales>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSales<TData = Awaited<ReturnType<typeof getSales>>, TError = unknown>(
+ params: GetSalesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSales>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSales<TData = Awaited<ReturnType<typeof getSales>>, TError = unknown>(
+ params: GetSalesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSales>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetSalesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetSalesCsvUrl = (params: GetSalesCsvParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/invoicing/sales.csv?${stringifiedParams}` : `/api/invoicing/sales.csv`
+}
+
+export const getSalesCsv = async (params: GetSalesCsvParams, options?: Parameters<typeof request>[1]): Promise<string> => {
+
+  return request<string>(getGetSalesCsvUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSalesCsvQueryKey = (params?: GetSalesCsvParams,) => {
+    return [
+    `/api/invoicing/sales.csv`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetSalesCsvQueryOptions = <TData = Awaited<ReturnType<typeof getSalesCsv>>, TError = unknown>(params: GetSalesCsvParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSalesCsv>>, TError, TData>>, request?: SecondParameter<typeof request>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSalesCsvQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSalesCsv>>> = ({ signal }) => getSalesCsv(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSalesCsv>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetSalesCsvQueryResult = NonNullable<Awaited<ReturnType<typeof getSalesCsv>>>
+export type GetSalesCsvQueryError = unknown
+
+
+export function useGetSalesCsv<TData = Awaited<ReturnType<typeof getSalesCsv>>, TError = unknown>(
+ params: GetSalesCsvParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSalesCsv>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSalesCsv>>,
+          TError,
+          Awaited<ReturnType<typeof getSalesCsv>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSalesCsv<TData = Awaited<ReturnType<typeof getSalesCsv>>, TError = unknown>(
+ params: GetSalesCsvParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSalesCsv>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSalesCsv>>,
+          TError,
+          Awaited<ReturnType<typeof getSalesCsv>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSalesCsv<TData = Awaited<ReturnType<typeof getSalesCsv>>, TError = unknown>(
+ params: GetSalesCsvParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSalesCsv>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSalesCsv<TData = Awaited<ReturnType<typeof getSalesCsv>>, TError = unknown>(
+ params: GetSalesCsvParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSalesCsv>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetSalesCsvQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetMenuUrl = () => {
 
@@ -2583,6 +3103,168 @@ export function useGetKitchen<TData = Awaited<ReturnType<typeof getKitchen>>, TE
 
 
 
+export const getGetPaymentsUrl = (day: string,) => {
+
+
+
+
+  return `/api/orders/payments/${day}`
+}
+
+export const getPayments = async (day: string, options?: Parameters<typeof request>[1]): Promise<PaymentView[]> => {
+
+  return request<PaymentView[]>(getGetPaymentsUrl(day),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPaymentsQueryKey = (day: string,) => {
+    return [
+    `/api/orders/payments/${day}`
+    ] as const;
+    }
+
+
+export const getGetPaymentsQueryOptions = <TData = Awaited<ReturnType<typeof getPayments>>, TError = unknown>(day: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPayments>>, TError, TData>>, request?: SecondParameter<typeof request>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPaymentsQueryKey(day);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPayments>>> = ({ signal }) => getPayments(day, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: day !== null && day !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPayments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPaymentsQueryResult = NonNullable<Awaited<ReturnType<typeof getPayments>>>
+export type GetPaymentsQueryError = unknown
+
+
+export function useGetPayments<TData = Awaited<ReturnType<typeof getPayments>>, TError = unknown>(
+ day: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPayments>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPayments>>,
+          TError,
+          Awaited<ReturnType<typeof getPayments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPayments<TData = Awaited<ReturnType<typeof getPayments>>, TError = unknown>(
+ day: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPayments>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPayments>>,
+          TError,
+          Awaited<ReturnType<typeof getPayments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPayments<TData = Awaited<ReturnType<typeof getPayments>>, TError = unknown>(
+ day: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPayments>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPayments<TData = Awaited<ReturnType<typeof getPayments>>, TError = unknown>(
+ day: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPayments>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPaymentsQueryOptions(day,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getVerifyPaymentUrl = (id: number,) => {
+
+
+
+
+  return `/api/orders/payments/${id}/verified`
+}
+
+export const verifyPayment = async (id: number, options?: Parameters<typeof request>[1]): Promise<void> => {
+
+  return request<void>(getVerifyPaymentUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+
+
+  }
+);}
+
+
+
+
+
+export const getVerifyPaymentMutationKey = () => ['verifyPayment'] as const;
+
+export const getVerifyPaymentMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyPayment>>, TError,VerifyPaymentMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof verifyPayment>>, TError,VerifyPaymentMutationVariables, TContext> => {
+
+const mutationKey = getVerifyPaymentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifyPayment>>, VerifyPaymentMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  verifyPayment(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerifyPaymentMutationResult = NonNullable<Awaited<ReturnType<typeof verifyPayment>>>
+
+    export type VerifyPaymentMutationError = unknown
+    export type VerifyPaymentMutationVariables = {id: number}
+
+    export const useVerifyPayment = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyPayment>>, TError,VerifyPaymentMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof verifyPayment>>,
+        TError,
+        VerifyPaymentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getVerifyPaymentMutationOptions(options), queryClient);
+    }
+
 export const getFinishRoundUrl = (id: number,) => {
 
 
@@ -2906,6 +3588,89 @@ export function useGetTracking<TData = Awaited<ReturnType<typeof getTracking>>, 
 
 
 
+
+export const getCancelOrderUrl = (id: number,) => {
+
+
+
+
+  return `/api/orders/${id}/cancel`
+}
+
+export const cancelOrder = async (id: number,
+    cancellation: Cancellation, options?: Parameters<typeof request>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return request<void>(getCancelOrderUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(cancellation)
+  }
+);}
+
+
+
+
+
+export const getCancelOrderMutationKey = () => ['cancelOrder'] as const;
+
+export const getCancelOrderMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelOrder>>, TError,CancelOrderMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelOrder>>, TError,CancelOrderMutationVariables, TContext> => {
+
+const mutationKey = getCancelOrderMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelOrder>>, CancelOrderMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  cancelOrder(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelOrderMutationResult = NonNullable<Awaited<ReturnType<typeof cancelOrder>>>
+    export type CancelOrderMutationBody = Cancellation
+    export type CancelOrderMutationError = unknown
+    export type CancelOrderMutationVariables = {id: number;data: Cancellation}
+
+    export const useCancelOrder = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelOrder>>, TError,CancelOrderMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof cancelOrder>>,
+        TError,
+        CancelOrderMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCancelOrderMutationOptions(options), queryClient);
+    }
 
 export const getCloseOrderUrl = (id: number,) => {
 

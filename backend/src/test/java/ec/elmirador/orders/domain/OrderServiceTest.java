@@ -117,6 +117,16 @@ class OrderServiceTest {
 			statuses.add(status);
 		}
 
+		@Override
+		public List<OrderRepository.PaymentView> payments(OffsetDateTime since) {
+			return List.of();
+		}
+
+		@Override
+		public boolean verifyPayment(long paymentId, long staffId) {
+			return true;
+		}
+
 	}
 
 	private final InMemoryOrders orders = new InMemoryOrders();
@@ -140,7 +150,7 @@ class OrderServiceTest {
 	}
 
 	private static NewOrder order(NewLine... lines) {
-		return new NewOrder("Ana", "593999999999", null, null, List.of(lines));
+		return new NewOrder("Ana", "593999999999", null, null, List.of(lines), null);
 	}
 
 	private static NewLine product(long variant, Long... options) {
@@ -198,6 +208,23 @@ class OrderServiceTest {
 				new NewPayment(PaymentMethod.transfer, new BigDecimal("2.50")))))).isEqualTo("closed");
 		orders.totals = new Totals("closed", new BigDecimal("12.50"), new BigDecimal("12.50"), "USD");
 		assertThat(closeOutcome(service, cash.apply("12.50"))).isEqualTo("orders.notOpen");
+	}
+
+	@Test
+	void onlyAnOpenOrderCanBeCancelled() {
+		var service = service(StoreStatus.open, true);
+
+		service.cancel(1, "Se acabó el seco", 1);
+		orders.totals = new Totals("cancelled", new BigDecimal("12.50"), BigDecimal.ZERO, "USD");
+
+		assertThat(orders.statuses).containsExactly("cancelled");
+		try {
+			service.cancel(1, "otra vez", 1);
+		}
+		catch (ApiException error) {
+			assertThat(error.getBody().getProperties()).containsEntry("code", "orders.notOpen");
+		}
+		assertThat(orders.statuses).containsExactly("cancelled");
 	}
 
 	@Test

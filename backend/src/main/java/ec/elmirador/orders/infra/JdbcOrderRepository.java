@@ -43,6 +43,8 @@ class JdbcOrderRepository implements OrderRepository {
 			    coalesce((select bool_and(r.ready_at is not null) from order_round r where r.customer_order_id = o.id), false) as all_ready,
 			    coalesce((select bool_or(r.started_at is not null) from order_round r where r.customer_order_id = o.id), false) as any_started,
 			    (select max(r.ready_at) from order_round r where r.customer_order_id = o.id) as ready_at,
+			    (select reason from order_status_change c where c.customer_order_id = o.id and c.status = 'cancelled') as cancel_reason,
+			    exists (select 1 from invoice_request i where i.customer_order_id = o.id) as invoice,
 			    %s as lines
 			  from customer_order o where %s
 			) o
@@ -167,6 +169,25 @@ class JdbcOrderRepository implements OrderRepository {
 			.param("reason", reason)
 			.param("staff", staffId)
 			.update();
+	}
+
+	@Override
+	public List<PaymentView> payments(OffsetDateTime since) {
+		return jdbc.sql("""
+				select p.id, p.customer_order_id as order_id, o.customer_name, p.method, p.amount, p.currency, p.created_at,
+				  p.verified_at is not null as verified
+				from payment p join customer_order o on o.id = p.customer_order_id
+				where p.created_at >= :since or (p.method = 'transfer' and p.verified_at is null)
+				order by p.created_at desc
+				""").param("since", since).query(PaymentView.class).list();
+	}
+
+	@Override
+	public boolean verifyPayment(long paymentId, long staffId) {
+		return jdbc.sql("""
+				update payment set verified_by = :staff, verified_at = now()
+				where id = :id and method = 'transfer' and verified_at is null
+				""").param("id", paymentId).param("staff", staffId).update() == 1;
 	}
 
 	private List<OrderView> orders(String filter, Map<String, ?> params) {

@@ -1,11 +1,14 @@
 package ec.elmirador.shared;
 
 import java.time.Clock;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springdoc.core.customizers.PropertyCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,6 +20,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.servers.Server;
+import jakarta.annotation.Nullable;
 
 @Configuration
 class SharedConfiguration {
@@ -35,6 +39,17 @@ class SharedConfiguration {
 	ModelResolver snakeCaseSchemas() {
 		return new ModelResolver(Json31.mapper().copy().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE))
 			.openapi31(true);
+	}
+
+	@Bean
+	PropertyCustomizer nullableReferences() {
+		return (property, type) -> {
+			var annotations = Optional.ofNullable(type.getCtxAnnotations()).map(Arrays::asList).orElse(List.of());
+			var nullable = annotations.stream().anyMatch(annotation -> annotation.annotationType() == Nullable.class);
+			return nullable && property.get$ref() != null
+					? new Schema<>().oneOf(List.of(new Schema<>().$ref(property.get$ref()), new Schema<>().types(Set.of("null"))))
+					: property;
+		};
 	}
 
 	@Bean

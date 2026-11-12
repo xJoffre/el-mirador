@@ -1,0 +1,23 @@
+{
+  "day": "Día",
+  "sales": "Ventas",
+  "cash": "Efectivo",
+  "transfers": "Transferencias",
+  "orders": "Pedidos cobrados",
+  "download": "Descargar CSV para el contador",
+  "toVerify": "Transferencias por confirmar",
+  "toVerifyHint": "Revisa que el dinero llegó al banco y confírmala.",
+  "noTransfers": "No hay transferencias por confirmar.",
+  "verify": "Llegó",
+  "verified": "Confirmada",
+  "invoices": "Facturas",
+  "invoicesHint": "Envía estos datos al contador y anota el número de la factura que emitió.",
+  "noInvoices": "No hay facturas pendientes.",
+  "invoiceNumber": "Número de factura",
+  "issued": "Emitida: {{number}}",
+  "order": "Pedido #{{id}}",
+  "orderStates": {
+    "open": "Se anota cuando el pedido esté cobrado.",
+    "cancelled": "Pedido cancelado: no se factura."
+  }
+}

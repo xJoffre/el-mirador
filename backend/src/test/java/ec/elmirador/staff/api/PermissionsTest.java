@@ -24,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import ec.elmirador.invoicing.domain.InvoiceService;
 import ec.elmirador.menu.domain.CatalogService;
 import ec.elmirador.menu.domain.LunchService;
 import ec.elmirador.menu.domain.MenuService;
@@ -62,6 +63,9 @@ class PermissionsTest {
 
 	@MockitoBean
 	private OrderService orders;
+
+	@MockitoBean
+	private InvoiceService invoices;
 
 	@MockitoBean
 	private EventStream events;
@@ -112,6 +116,13 @@ class PermissionsTest {
 				Arguments.of(HttpMethod.PUT, "/api/orders/rounds/1/ready", List.of("admin", "kitchen")),
 				Arguments.of(HttpMethod.GET, "/api/orders/today", List.of("admin", "floor")),
 				Arguments.of(HttpMethod.POST, "/api/orders/1/close", List.of("admin", "floor")),
+				Arguments.of(HttpMethod.POST, "/api/orders/1/cancel", admin),
+				Arguments.of(HttpMethod.GET, "/api/orders/payments/2026-11-14", admin),
+				Arguments.of(HttpMethod.PUT, "/api/orders/payments/1/verified", admin),
+				Arguments.of(HttpMethod.GET, "/api/invoicing/requests/2026-11-14", admin),
+				Arguments.of(HttpMethod.PUT, "/api/invoicing/requests/1", admin),
+				Arguments.of(HttpMethod.GET, "/api/invoicing/sales?from=2026-11-14&to=2026-11-14", admin),
+				Arguments.of(HttpMethod.GET, "/api/invoicing/sales.csv?from=2026-11-14&to=2026-11-14", admin),
 				Arguments.of(HttpMethod.GET, "/api/anything-new", admin));
 	}
 

@@ -89,11 +89,13 @@ export function TrackingPage() {
           </li>
         </ul>
 
-        <div className="grid gap-1 text-sm">
-          <p className="font-medium">{delivery_address ? t('deliveryTo', { address: delivery_address }) : t('pickupAt')}</p>
-          <p className="text-muted-foreground">{delivery_address ? t('payDelivery') : t('payHint')}</p>
-          {profile?.bank_account && <p className="text-muted-foreground">{t('bankAccount', { account: profile.bank_account })}</p>}
-        </div>
+        {state !== 'cancelled' && (
+          <div className="grid gap-1 text-sm">
+            <p className="font-medium">{delivery_address ? t('deliveryTo', { address: delivery_address }) : t('pickupAt')}</p>
+            <p className="text-muted-foreground">{delivery_address ? t('payDelivery') : t('payHint')}</p>
+            {profile?.bank_account && <p className="text-muted-foreground">{t('bankAccount', { account: profile.bank_account })}</p>}
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" render={<Link to="/" />} nativeButton={false}>

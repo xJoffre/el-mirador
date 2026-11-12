@@ -1,6 +1,7 @@
 import i18n, { type Resource, type ResourceLanguage } from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import type auth from './es/auth.json'
+import type cash from './es/cash.json'
 import type catalog from './es/catalog.json'
 import type common from './es/common.json'
 import type errors from './es/errors.json'
@@ -29,6 +30,7 @@ declare module 'i18next' {
     defaultNS: 'common'
     resources: {
       auth: typeof auth
+      cash: typeof cash
       catalog: typeof catalog
       common: typeof common
       errors: typeof errors
