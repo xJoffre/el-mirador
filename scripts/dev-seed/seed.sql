@@ -84,7 +84,9 @@ insert into product (id, menu_category_id, name, description, dine_in_only) valu
   (60, 10, pg_temp.es('Ceviche de camarón'), null, false),
   (61, 10, pg_temp.es('Camarón apanado'), null, false),
   (62, 10, pg_temp.es('Chaulafán'), null, false),
-  (63, 10, pg_temp.es('Chopsuey de camarón'), null, false);
+  (63, 10, pg_temp.es('Chopsuey de camarón'), null, false),
+  (64, 6, pg_temp.es('Gaseosa'), null, false),
+  (65, 7, pg_temp.es('Michelada'), null, true);
 
 insert into product_variant (product_id, price) values
   (1, 3.00), (2, 3.75), (3, 4.00), (4, 4.00), (5, 5.00), (6, 5.00), (7, 3.50), (8, 5.00), (9, 4.00),
@@ -109,7 +111,12 @@ insert into product_variant (product_id, name, price) values
   (58, pg_temp.es('Con carne seca, completo'), 5.00),
   (58, pg_temp.es('Con carne seca, medio'), 4.00),
   (62, pg_temp.es('Entero'), 8.00),
-  (62, pg_temp.es('Medio'), 4.50);
+  (62, pg_temp.es('Medio'), 4.50),
+  (64, pg_temp.es('Personal'), 0.75),
+  (64, pg_temp.es('Litro'), 1.25),
+  (64, pg_temp.es('Familiar, 3 litros'), 3.50),
+  (65, pg_temp.es('Pequeña'), 2.00),
+  (65, pg_temp.es('Grande'), 3.50);
 
 insert into option_group (id, product_id, name, min_choices, max_choices) values
   (1, 7, pg_temp.es('Seco'), 1, 1),
