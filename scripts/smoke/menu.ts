@@ -33,4 +33,12 @@ const schedule = GetScheduleResponse.parse(await (await fetch(`${base}/api/sched
 assert.equal(Object.keys(schedule.week).length, count('select count(*) from weekly_hours'), 'the weekly hours are served')
 assert.equal(schedule.profile.name, execFileSync('psql', ['-tAc', 'select name from store_profile'], { encoding: 'utf8' }).trim(), 'the store profile is served')
 
+const visits = await Promise.all(
+  Array.from({ length: 30 }, async () => {
+    const visit = (path: string) => fetch(`${base}${path}`, { signal: AbortSignal.timeout(10_000) }).then((response) => response.status)
+    return [await visit('/api/schedule'), await visit('/api/menu')]
+  }),
+)
+assert.ok(visits.flat().every((status) => status === 200), 'thirty visits in a row do not exhaust the database connections')
+
 process.stdout.write(`smoke ok: menu and schedule at ${base}\n`)

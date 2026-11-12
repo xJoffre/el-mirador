@@ -29,6 +29,7 @@ class JdbcScheduleRepository implements ScheduleRepository {
 	public Map<Integer, Hours> weeklyHours() {
 		return jdbc.sql("select weekday, " + HOURS + " from weekly_hours")
 			.query((rs, row) -> Map.entry(rs.getInt("weekday"), HOURS_ROW.mapRow(rs, row)))
+			.list()
 			.stream()
 			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
