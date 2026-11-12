@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
-const TOPICS = { menu: '/api/menu', schedule: '/api/schedule' }
+const TOPICS = { menu: '/api/menu', schedule: '/api/schedule', orders: '/api/orders' }
 
 export function LiveUpdates() {
   const queries = useQueryClient()

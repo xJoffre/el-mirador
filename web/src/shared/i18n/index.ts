@@ -4,7 +4,9 @@ import type auth from './es/auth.json'
 import type catalog from './es/catalog.json'
 import type common from './es/common.json'
 import type errors from './es/errors.json'
+import type kitchen from './es/kitchen.json'
 import type lunch from './es/lunch.json'
+import type orders from './es/orders.json'
 import type panel from './es/panel.json'
 import type site from './es/site.json'
 import type soldOut from './es/soldOut.json'
@@ -30,7 +32,9 @@ declare module 'i18next' {
       catalog: typeof catalog
       common: typeof common
       errors: typeof errors
+      kitchen: typeof kitchen
       lunch: typeof lunch
+      orders: typeof orders
       panel: typeof panel
       site: typeof site
       soldOut: typeof soldOut

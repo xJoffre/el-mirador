@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ec.elmirador.menu.domain.CatalogService;
 import ec.elmirador.menu.domain.LunchService;
 import ec.elmirador.menu.domain.MenuService;
+import ec.elmirador.orders.domain.OrderService;
 import ec.elmirador.schedule.domain.ScheduleService;
 import ec.elmirador.shared.AppProperties;
 import ec.elmirador.shared.EventStream;
@@ -58,6 +59,9 @@ class PermissionsTest {
 
 	@MockitoBean
 	private LunchService lunches;
+
+	@MockitoBean
+	private OrderService orders;
 
 	@MockitoBean
 	private EventStream events;
@@ -101,6 +105,13 @@ class PermissionsTest {
 				Arguments.of(HttpMethod.GET, "/api/staff/users", admin),
 				Arguments.of(HttpMethod.POST, "/api/staff/users", admin),
 				Arguments.of(HttpMethod.PUT, "/api/staff/users/2", admin),
+				Arguments.of(HttpMethod.POST, "/api/orders", everyone),
+				Arguments.of(HttpMethod.GET, "/api/orders/tracking/abc", everyone),
+				Arguments.of(HttpMethod.GET, "/api/orders/kitchen", List.of("admin", "kitchen")),
+				Arguments.of(HttpMethod.PUT, "/api/orders/rounds/1/start", List.of("admin", "kitchen")),
+				Arguments.of(HttpMethod.PUT, "/api/orders/rounds/1/ready", List.of("admin", "kitchen")),
+				Arguments.of(HttpMethod.GET, "/api/orders/today", List.of("admin", "floor")),
+				Arguments.of(HttpMethod.POST, "/api/orders/1/close", List.of("admin", "floor")),
 				Arguments.of(HttpMethod.GET, "/api/anything-new", admin));
 	}
 

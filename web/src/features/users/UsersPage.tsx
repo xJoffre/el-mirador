@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useSaved } from '@/features/panel/useSaved'
 import { getGetUsersQueryKey, SessionRole, useCreateUser, useGetSession, useGetUsers, useUpdateUser, type NewUser, type User, type UserChange } from '@/shared/api/client'
 import { CreateUserBody, UpdateUserBody } from '@/shared/api/schemas'
+import { emptyIsNull } from '@/shared/lib/format'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
@@ -91,7 +92,7 @@ function UserRow({ user, isSelf }: { user: User; isSelf: boolean }) {
             autoComplete="off"
             placeholder={t('newPinHint')}
             aria-invalid={!!form.formState.errors.pin}
-            {...form.register('pin', { setValueAs: (value: string) => (value === '' ? null : value) })}
+            {...form.register('pin', emptyIsNull)}
           />
         </div>
         <Button type="submit" disabled={update.isPending}>

@@ -362,6 +362,169 @@ export const MarkProductSoldOutBody = zod.object({
 export const MarkProductSoldOutResponse = zod.void()
 
 
+export const placeOrderBodyCustomerNameMin = 0;
+export const placeOrderBodyCustomerNameMax = 80;
+
+export const placeOrderBodyCustomerPhoneRegExp = new RegExp('[0-9]{7,15}');
+export const placeOrderBodyDeliveryAddressMin = 0;
+export const placeOrderBodyDeliveryAddressMax = 300;
+
+export const placeOrderBodyLinesItemNoteMin = 0;
+export const placeOrderBodyLinesItemNoteMax = 200;
+
+export const placeOrderBodyLinesItemQuantityMax = 50;
+
+export const placeOrderBodyLinesMin = 0;
+export const placeOrderBodyLinesMax = 40;
+
+export const placeOrderBodyNoteMin = 0;
+export const placeOrderBodyNoteMax = 300;
+
+
+
+export const PlaceOrderBody = zod.object({
+  "customer_name": zod.string().min(placeOrderBodyCustomerNameMin).max(placeOrderBodyCustomerNameMax),
+  "customer_phone": zod.string().regex(placeOrderBodyCustomerPhoneRegExp),
+  "delivery_address": zod.string().min(placeOrderBodyDeliveryAddressMin).max(placeOrderBodyDeliveryAddressMax).nullable(),
+  "lines": zod.array(zod.object({
+  "kind": zod.enum(['product', 'lunch_full', 'lunch_soup', 'lunch_main']),
+  "main_dish_id": zod.int().nullable(),
+  "note": zod.string().min(placeOrderBodyLinesItemNoteMin).max(placeOrderBodyLinesItemNoteMax).nullable(),
+  "option_item_ids": zod.array(zod.int()).nullable(),
+  "product_variant_id": zod.int().nullable(),
+  "quantity": zod.int().min(1).max(placeOrderBodyLinesItemQuantityMax),
+  "soup_dish_id": zod.int().nullable()
+})).min(placeOrderBodyLinesMin).max(placeOrderBodyLinesMax),
+  "note": zod.string().min(placeOrderBodyNoteMin).max(placeOrderBodyNoteMax).nullable()
+})
+
+export const PlaceOrderResponse = zod.object({
+  "currency": zod.string(),
+  "id": zod.int(),
+  "total": zod.number(),
+  "tracking_token": zod.string()
+})
+
+
+export const GetKitchenResponseItem = zod.object({
+  "created_at": zod.iso.datetime({"offset":true}),
+  "customer_name": zod.string(),
+  "delivery_address": zod.string().nullable(),
+  "lines": zod.array(zod.object({
+  "currency": zod.string(),
+  "id": zod.int(),
+  "kind": zod.enum(['product', 'lunch_full', 'lunch_soup', 'lunch_main']),
+  "main": zod.record(zod.string(), zod.string()).nullable(),
+  "note": zod.string().nullable(),
+  "options": zod.array(zod.record(zod.string(), zod.string())),
+  "product": zod.record(zod.string(), zod.string()).nullable(),
+  "quantity": zod.int(),
+  "soup": zod.record(zod.string(), zod.string()).nullable(),
+  "unit_price": zod.number(),
+  "variant": zod.record(zod.string(), zod.string()).nullable()
+})),
+  "note": zod.string().nullable(),
+  "order_id": zod.int(),
+  "round_id": zod.int(),
+  "started_at": zod.iso.datetime({"offset":true}).nullable()
+})
+export const GetKitchenResponse = zod.array(GetKitchenResponseItem)
+
+
+export const FinishRoundParams = zod.object({
+  "id": zod.int()
+})
+
+export const FinishRoundResponse = zod.void()
+
+
+export const StartRoundParams = zod.object({
+  "id": zod.int()
+})
+
+export const StartRoundResponse = zod.void()
+
+
+export const GetTodayOrdersResponseItem = zod.object({
+  "created_at": zod.iso.datetime({"offset":true}),
+  "currency": zod.string(),
+  "customer_name": zod.string(),
+  "customer_phone": zod.string(),
+  "delivery_address": zod.string().nullable(),
+  "id": zod.int(),
+  "lines": zod.array(zod.object({
+  "currency": zod.string(),
+  "id": zod.int(),
+  "kind": zod.enum(['product', 'lunch_full', 'lunch_soup', 'lunch_main']),
+  "main": zod.record(zod.string(), zod.string()).nullable(),
+  "note": zod.string().nullable(),
+  "options": zod.array(zod.record(zod.string(), zod.string())),
+  "product": zod.record(zod.string(), zod.string()).nullable(),
+  "quantity": zod.int(),
+  "soup": zod.record(zod.string(), zod.string()).nullable(),
+  "unit_price": zod.number(),
+  "variant": zod.record(zod.string(), zod.string()).nullable()
+})),
+  "note": zod.string().nullable(),
+  "paid": zod.number(),
+  "ready_at": zod.iso.datetime({"offset":true}).nullable(),
+  "state": zod.enum(['received', 'preparing', 'ready', 'delivered', 'cancelled']),
+  "total": zod.number()
+})
+export const GetTodayOrdersResponse = zod.array(GetTodayOrdersResponseItem)
+
+
+export const GetTrackingParams = zod.object({
+  "token": zod.string()
+})
+
+export const GetTrackingResponse = zod.object({
+  "created_at": zod.iso.datetime({"offset":true}),
+  "currency": zod.string(),
+  "customer_name": zod.string(),
+  "customer_phone": zod.string(),
+  "delivery_address": zod.string().nullable(),
+  "id": zod.int(),
+  "lines": zod.array(zod.object({
+  "currency": zod.string(),
+  "id": zod.int(),
+  "kind": zod.enum(['product', 'lunch_full', 'lunch_soup', 'lunch_main']),
+  "main": zod.record(zod.string(), zod.string()).nullable(),
+  "note": zod.string().nullable(),
+  "options": zod.array(zod.record(zod.string(), zod.string())),
+  "product": zod.record(zod.string(), zod.string()).nullable(),
+  "quantity": zod.int(),
+  "soup": zod.record(zod.string(), zod.string()).nullable(),
+  "unit_price": zod.number(),
+  "variant": zod.record(zod.string(), zod.string()).nullable()
+})),
+  "note": zod.string().nullable(),
+  "paid": zod.number(),
+  "ready_at": zod.iso.datetime({"offset":true}).nullable(),
+  "state": zod.enum(['received', 'preparing', 'ready', 'delivered', 'cancelled']),
+  "total": zod.number()
+})
+
+
+export const CloseOrderParams = zod.object({
+  "id": zod.int()
+})
+
+export const closeOrderBodyPaymentsItemAmountMin = 0.01;
+
+
+
+
+export const CloseOrderBody = zod.object({
+  "payments": zod.array(zod.object({
+  "amount": zod.number().min(closeOrderBodyPaymentsItemAmountMin),
+  "method": zod.enum(['cash', 'transfer'])
+})).min(1)
+})
+
+export const CloseOrderResponse = zod.void()
+
+
 
 export const getScheduleResponseProfileWhatsappRegExp = new RegExp('[0-9]{8,15}');
 export const getScheduleResponseStatusWaitMinutesExclusiveMin = 0;

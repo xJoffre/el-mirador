@@ -6,7 +6,8 @@ Pedidos en línea para El Mirador, bar-restaurante de Zaruma: la carta y el almu
 
 - **Menú web**: la carta y el almuerzo del día, con lo que está disponible en este momento.
 - **Panel**: cada persona entra con su nombre y PIN y ve lo que su rol permite; carta con fotos, horario y estado del local, usuarios, agotados del día, pedidos, caja y datos de factura para el contador.
-- **Cocina**: la fila única de comandas, que se actualiza sola (SSE).
+- **Cocina**: la fila única de comandas, que se actualiza sola (SSE) y suena al llegar una nueva.
+- **Seguimiento**: el cliente ve su pedido pasar de recibido a listo sin recargar la página.
 
 ## Cómo correrlo
 

@@ -3,6 +3,7 @@ import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
 import { toast } from 'sonner'
 import { SitePage } from '@/features/site/SitePage'
+import { TrackingPage } from '@/features/site/TrackingPage'
 import { getGetSessionQueryKey } from '@/shared/api/client'
 import { errorText } from '@/shared/lib/format'
 import { LiveUpdates } from '@/shared/lib/live'
@@ -27,6 +28,7 @@ const Nothing = () => null
 
 const router = createBrowserRouter([
   { path: '/', element: <SitePage /> },
+  { path: '/pedido/:token', element: <TrackingPage /> },
   { path: '/ingreso', HydrateFallback: Nothing, lazy: async () => ({ Component: (await import('@/features/auth/SignInPage')).SignInPage }) },
   { path: '/panel/*', HydrateFallback: Nothing, lazy: async () => ({ Component: (await import('@/features/panel/PanelRoutes')).PanelRoutes }) },
 ])

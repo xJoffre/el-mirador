@@ -40,4 +40,39 @@ select pg_temp.rejects($$insert into store_profile (id, name) values (2, 'Otro l
 select pg_temp.rejects($$insert into store_profile (name) values ('Otro local')$$);
 select pg_temp.rejects($$update store_profile set whatsapp = '+593 99 123 4567'$$);
 
+select pg_temp.rejects($$insert into customer_order (tracking_token, kind, channel, customer_name) values ('qa-a', 'takeaway', 'web', 'Ana')$$);
+select pg_temp.rejects($$insert into customer_order (tracking_token, kind, channel, delivery_address) values ('qa-b', 'dine_in', 'floor', 'Calle')$$);
+
+insert into customer_order (id, tracking_token, kind, channel, customer_name, customer_phone)
+values (900001, 'qa-order', 'takeaway', 'web', 'QA', '593999999999');
+insert into order_status_change (customer_order_id, status) values (900001, 'open');
+insert into order_round (id, customer_order_id) values (900001, 900001);
+insert into order_line (id, order_round_id, kind, product_variant_id, quantity)
+values (900001, 900001, 'product', (select min(id) from product_variant), 2);
+
+select pg_temp.rejects($$insert into order_line (order_round_id, kind, quantity) values (900001, 'product', 1)$$);
+select pg_temp.rejects($$insert into order_line (order_round_id, kind, product_variant_id, menu_date, quantity) values (900001, 'product', (select min(id) from product_variant), current_date, 1)$$);
+select pg_temp.rejects($$insert into order_line (order_round_id, kind, menu_date, soup_dish_id, quantity) values (900001, 'lunch_full', current_date, 1, 1)$$);
+select pg_temp.rejects($$insert into order_line (order_round_id, kind, product_variant_id, quantity) values (900001, 'product', (select min(id) from product_variant), 0)$$);
+select pg_temp.rejects($$insert into order_status_change (customer_order_id, status) values (900001, 'closed')$$);
+select pg_temp.rejects($$insert into payment (customer_order_id, method, amount, currency, created_by, verified_by, verified_at) values (900001, 'cash', 1, 'USD', 1, 1, now())$$);
+
+do $$
+begin
+  update order_line set unit_price = 0.01 where id = 900001;
+  if (select unit_price from order_line where id = 900001) <> (select price from product_variant where id = (select min(id) from product_variant)) then
+    raise exception 'the sale price of a line was changed';
+  end if;
+  if (select total from customer_order where id = 900001) <> 2 * (select price from product_variant where id = (select min(id) from product_variant)) then
+    raise exception 'the total does not follow the lines';
+  end if;
+end
+$$;
+
+insert into payment (customer_order_id, method, amount, currency, created_by)
+values (900001, 'cash', (select total from customer_order where id = 900001), 'USD', 1);
+insert into order_status_change (customer_order_id, status) values (900001, 'closed');
+select pg_temp.rejects($$insert into order_status_change (customer_order_id, status) values (900001, 'open')$$);
+select pg_temp.rejects($$insert into order_status_change (customer_order_id, status) values (900001, 'cancelled')$$);
+
 rollback;

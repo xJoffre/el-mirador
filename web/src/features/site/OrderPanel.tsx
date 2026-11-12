@@ -1,5 +1,7 @@
 import { Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { CheckoutDialog } from '@/features/site/CheckoutDialog'
 import type { ResolvedLine } from '@/features/site/cart'
 import { useOrder } from '@/features/site/useCart'
 import type { Menu, Schedule } from '@/shared/api/client'
@@ -28,7 +30,9 @@ export function OrderPanel({ menu, schedule }: { menu: Menu; schedule: Schedule 
   const { t } = useTranslation('site')
   const { cart, lines, total, currency } = useOrder(menu, schedule)
   const nameOf = useLineName()
-  const whatsapp = schedule.profile.whatsapp
+  const [checkout, setCheckout] = useState(false)
+  const blocked =
+    schedule.status.status === 'closed' ? t('storeClosedNow') : lines.some((line) => !line.available) ? t('fixOrder') : undefined
 
   return (
     <div className="grid content-start gap-4">
@@ -80,11 +84,16 @@ export function OrderPanel({ menu, schedule }: { menu: Menu; schedule: Schedule 
             <span>{t('total')}</span>
             <span>{money(total, currency)}</span>
           </p>
-          <p className="text-sm text-muted-foreground">{t('sendSoon')}</p>
-          {whatsapp && (
-            <Button render={<a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noreferrer" />} nativeButton={false}>
-              {t('writeUs')}
-            </Button>
+          {blocked && (
+            <p className="text-sm font-medium text-accent-foreground" role="status">
+              {blocked}
+            </p>
+          )}
+          <Button size="lg" disabled={!!blocked} onClick={() => setCheckout(true)}>
+            {t('checkout')}
+          </Button>
+          {checkout && (
+            <CheckoutDialog lines={lines.filter((line) => line.available)} total={total} currency={currency} onClose={() => setCheckout(false)} />
           )}
         </>
       )}

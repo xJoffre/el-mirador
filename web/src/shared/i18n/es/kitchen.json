@@ -1,0 +1,9 @@
+{
+  "enableSound": "Activar sonido",
+  "soundOn": "Sonido activado",
+  "empty": "No hay comandas pendientes.",
+  "start": "Empezar",
+  "ready": "Listo",
+  "started": "En preparación",
+  "note": "Nota: {{note}}"
+}

@@ -2,6 +2,7 @@ import { Clock, Info, Search, ShoppingBag } from 'lucide-react'
 import { DynamicIcon } from 'lucide-react/dynamic'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router'
 import type { SectionIcon } from '@/features/catalog/catalog'
 import { lineKey } from '@/features/site/cart'
 import { DishCard } from '@/features/site/DishCard'
@@ -9,7 +10,7 @@ import { DishDialog } from '@/features/site/DishDialog'
 import { LunchSection } from '@/features/site/LunchSection'
 import { OrderPanel } from '@/features/site/OrderPanel'
 import { StoreInfoDialog } from '@/features/site/StoreInfoDialog'
-import { useCart, useOrder } from '@/features/site/useCart'
+import { rememberedOrders, useCart, useOrder } from '@/features/site/useCart'
 import zaruma from '@/features/site/zaruma.jpg'
 import { useGetMenu, useGetSchedule, type Menu, type Product, type Schedule } from '@/shared/api/client'
 import { money, useLabel } from '@/shared/lib/format'
@@ -42,6 +43,7 @@ function Site({ menu, schedule }: { menu: Menu; schedule: Schedule }) {
   const [dish, setDish] = useState<Product>()
   const [info, setInfo] = useState(false)
   const [orderOpen, setOrderOpen] = useState(false)
+  const [latest] = useState(() => rememberedOrders()[0])
 
   const tabs: Tab[] = [...(menu.lunch.length > 0 ? [LUNCH] : []), ...menu.categories.map((category) => category.id)]
   const current = tab !== undefined && tabs.includes(tab) ? tab : tabs[0]
@@ -93,7 +95,12 @@ function Site({ menu, schedule }: { menu: Menu; schedule: Schedule }) {
             <p className="font-semibold">{t('tagline')}</p>
             {schedule.profile.address && <p className="text-sm text-muted-foreground">{schedule.profile.address}</p>}
           </div>
-          <Button variant="secondary" className="ml-auto" onClick={() => setInfo(true)}>
+          {latest && (
+            <Button variant="secondary" className="ml-auto" render={<Link to={`/pedido/${latest.tracking_token}`} />} nativeButton={false}>
+              {t('orderNumber', { id: latest.id })}
+            </Button>
+          )}
+          <Button variant="secondary" className={latest ? undefined : 'ml-auto'} onClick={() => setInfo(true)}>
             <Info aria-hidden />
             <span className="hidden sm:inline">{t('info')}</span>
           </Button>

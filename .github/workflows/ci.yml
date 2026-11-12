@@ -87,6 +87,13 @@ jobs:
           node scripts/smoke/availability.ts http://localhost:8080
           node scripts/smoke/staff.ts http://localhost:8080
           node scripts/smoke/live.ts http://localhost:8080
+          node scripts/smoke/orders.ts http://localhost:8080
+
+      - name: end to end
+        working-directory: web
+        run: |
+          npx playwright install --with-deps chromium
+          npx playwright test
 
   docker:
     runs-on: ubuntu-latest

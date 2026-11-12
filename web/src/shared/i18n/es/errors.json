@@ -3,7 +3,8 @@
     "unexpected": "Algo salió mal. Intenta otra vez.",
     "invalid": "Revisa los datos: hay algo que no está bien escrito.",
     "duplicate": "Ya existe uno con ese nombre.",
-    "rejected": "No se pudo guardar: algo depende de esto o los datos no cuadran."
+    "rejected": "No se pudo guardar: algo depende de esto o los datos no cuadran.",
+    "inUse": "Ya se usó en pedidos, así que no se puede borrar. Puedes ocultarlo."
   },
   "staff": {
     "wrongPin": "PIN incorrecto.",
@@ -18,5 +19,16 @@
   "menu": {
     "notFound": "Ese plato o sección ya no existe.",
     "notAnImage": "El archivo no es una foto."
+  },
+  "orders": {
+    "storeClosed": "Ahora no estamos recibiendo pedidos.",
+    "lunchClosed": "El almuerzo ya no se está sirviendo.",
+    "soldOut": "Se acabó algo de tu pedido. Revisa el pedido y vuelve a enviarlo.",
+    "dineInOnly": "Hay algo en tu pedido que solo se vende en el local.",
+    "missingChoice": "Falta elegir algo en uno de los platos.",
+    "unavailable": "Algo de tu pedido ya no está en la carta. Revisa el pedido.",
+    "notFound": "Ese pedido no existe.",
+    "notOpen": "Ese pedido ya se cerró.",
+    "paymentShort": "Lo cobrado no cubre el total del pedido."
   }
 }

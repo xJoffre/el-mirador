@@ -164,6 +164,25 @@ export interface CategoryForm {
   name: CategoryFormName;
 }
 
+export type NewPaymentMethod = typeof NewPaymentMethod[keyof typeof NewPaymentMethod];
+
+
+export const NewPaymentMethod = {
+  cash: 'cash',
+  transfer: 'transfer',
+} as const;
+
+export interface NewPayment {
+  /** @minimum 0.01 */
+  amount: number;
+  method: NewPaymentMethod;
+}
+
+export interface Closing {
+  /** @minItems 1 */
+  payments: NewPayment[];
+}
+
 export type DailyDishKind = typeof DailyDishKind[keyof typeof DailyDishKind];
 
 
@@ -194,6 +213,71 @@ export interface Hours {
   lunch_starts_at: string | null;
   /** @nullable */
   opens_at: string | null;
+}
+
+export type LineViewKind = typeof LineViewKind[keyof typeof LineViewKind];
+
+
+export const LineViewKind = {
+  product: 'product',
+  lunch_full: 'lunch_full',
+  lunch_soup: 'lunch_soup',
+  lunch_main: 'lunch_main',
+} as const;
+
+/**
+ * @nullable
+ */
+export type LineViewMain = {[key: string]: string} | null;
+
+export type LineViewOptionsItem = {[key: string]: string};
+
+/**
+ * @nullable
+ */
+export type LineViewProduct = {[key: string]: string} | null;
+
+/**
+ * @nullable
+ */
+export type LineViewSoup = {[key: string]: string} | null;
+
+/**
+ * @nullable
+ */
+export type LineViewVariant = {[key: string]: string} | null;
+
+export interface LineView {
+  currency: string;
+  id: number;
+  kind: LineViewKind;
+  /** @nullable */
+  main: LineViewMain;
+  /** @nullable */
+  note: string | null;
+  options: LineViewOptionsItem[];
+  /** @nullable */
+  product: LineViewProduct;
+  quantity: number;
+  /** @nullable */
+  soup: LineViewSoup;
+  unit_price: number;
+  /** @nullable */
+  variant: LineViewVariant;
+}
+
+export interface KitchenTicket {
+  created_at: string;
+  customer_name: string;
+  /** @nullable */
+  delivery_address: string | null;
+  lines: LineView[];
+  /** @nullable */
+  note: string | null;
+  order_id: number;
+  round_id: number;
+  /** @nullable */
+  started_at: string | null;
 }
 
 export type LunchDishKind = typeof LunchDishKind[keyof typeof LunchDishKind];
@@ -276,6 +360,66 @@ export interface Menu {
   lunch_includes: MenuLunchIncludes;
 }
 
+export type NewLineKind = typeof NewLineKind[keyof typeof NewLineKind];
+
+
+export const NewLineKind = {
+  product: 'product',
+  lunch_full: 'lunch_full',
+  lunch_soup: 'lunch_soup',
+  lunch_main: 'lunch_main',
+} as const;
+
+export interface NewLine {
+  kind: NewLineKind;
+  /** @nullable */
+  main_dish_id: number | null;
+  /**
+     * @minLength 0
+     * @maxLength 200
+     * @nullable
+     */
+  note: string | null;
+  /** @nullable */
+  option_item_ids: number[] | null;
+  /** @nullable */
+  product_variant_id: number | null;
+  /**
+     * @minimum 1
+     * @maximum 50
+     */
+  quantity: number;
+  /** @nullable */
+  soup_dish_id: number | null;
+}
+
+export interface NewOrder {
+  /**
+     * @minLength 0
+     * @maxLength 80
+     */
+  customer_name: string;
+  /** @pattern [0-9]{7,15} */
+  customer_phone: string;
+  /**
+     * @minLength 0
+     * @maxLength 300
+     * @nullable
+     */
+  delivery_address: string | null;
+  /**
+     * @minItems 0
+     * @maxItems 40
+     */
+  lines: NewLine[];
+  /**
+     * @minLength 0
+     * @maxLength 300
+     * @nullable
+     */
+  note: string | null;
+}
+
 export type NewUserRole = typeof NewUserRole[keyof typeof NewUserRole];
 
 
@@ -324,8 +468,44 @@ export interface Order {
   ids: number[];
 }
 
+export type OrderViewState = typeof OrderViewState[keyof typeof OrderViewState];
+
+
+export const OrderViewState = {
+  received: 'received',
+  preparing: 'preparing',
+  ready: 'ready',
+  delivered: 'delivered',
+  cancelled: 'cancelled',
+} as const;
+
+export interface OrderView {
+  created_at: string;
+  currency: string;
+  customer_name: string;
+  customer_phone: string;
+  /** @nullable */
+  delivery_address: string | null;
+  id: number;
+  lines: LineView[];
+  /** @nullable */
+  note: string | null;
+  paid: number;
+  /** @nullable */
+  ready_at: string | null;
+  state: OrderViewState;
+  total: number;
+}
+
 export interface Photo {
   photo: string;
+}
+
+export interface Placed {
+  currency: string;
+  id: number;
+  total: number;
+  tracking_token: string;
 }
 
 /**
@@ -2225,6 +2405,589 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getMarkProductSoldOutMutationOptions(options), queryClient);
+    }
+
+export const getPlaceOrderUrl = () => {
+
+
+
+
+  return `/api/orders`
+}
+
+export const placeOrder = async (newOrder: NewOrder, options?: Parameters<typeof request>[1]): Promise<Placed> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return request<Placed>(getPlaceOrderUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(newOrder)
+  }
+);}
+
+
+
+
+
+export const getPlaceOrderMutationKey = () => ['placeOrder'] as const;
+
+export const getPlaceOrderMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof placeOrder>>, TError,PlaceOrderMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof placeOrder>>, TError,PlaceOrderMutationVariables, TContext> => {
+
+const mutationKey = getPlaceOrderMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof placeOrder>>, PlaceOrderMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  placeOrder(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PlaceOrderMutationResult = NonNullable<Awaited<ReturnType<typeof placeOrder>>>
+    export type PlaceOrderMutationBody = NewOrder
+    export type PlaceOrderMutationError = unknown
+    export type PlaceOrderMutationVariables = {data: NewOrder}
+
+    export const usePlaceOrder = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof placeOrder>>, TError,PlaceOrderMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof placeOrder>>,
+        TError,
+        PlaceOrderMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPlaceOrderMutationOptions(options), queryClient);
+    }
+
+export const getGetKitchenUrl = () => {
+
+
+
+
+  return `/api/orders/kitchen`
+}
+
+export const getKitchen = async ( options?: Parameters<typeof request>[1]): Promise<KitchenTicket[]> => {
+
+  return request<KitchenTicket[]>(getGetKitchenUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetKitchenQueryKey = () => {
+    return [
+    `/api/orders/kitchen`
+    ] as const;
+    }
+
+
+export const getGetKitchenQueryOptions = <TData = Awaited<ReturnType<typeof getKitchen>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getKitchen>>, TError, TData>>, request?: SecondParameter<typeof request>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetKitchenQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getKitchen>>> = ({ signal }) => getKitchen({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getKitchen>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetKitchenQueryResult = NonNullable<Awaited<ReturnType<typeof getKitchen>>>
+export type GetKitchenQueryError = unknown
+
+
+export function useGetKitchen<TData = Awaited<ReturnType<typeof getKitchen>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getKitchen>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getKitchen>>,
+          TError,
+          Awaited<ReturnType<typeof getKitchen>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetKitchen<TData = Awaited<ReturnType<typeof getKitchen>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getKitchen>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getKitchen>>,
+          TError,
+          Awaited<ReturnType<typeof getKitchen>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetKitchen<TData = Awaited<ReturnType<typeof getKitchen>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getKitchen>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetKitchen<TData = Awaited<ReturnType<typeof getKitchen>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getKitchen>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetKitchenQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getFinishRoundUrl = (id: number,) => {
+
+
+
+
+  return `/api/orders/rounds/${id}/ready`
+}
+
+export const finishRound = async (id: number, options?: Parameters<typeof request>[1]): Promise<void> => {
+
+  return request<void>(getFinishRoundUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+
+
+  }
+);}
+
+
+
+
+
+export const getFinishRoundMutationKey = () => ['finishRound'] as const;
+
+export const getFinishRoundMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finishRound>>, TError,FinishRoundMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof finishRound>>, TError,FinishRoundMutationVariables, TContext> => {
+
+const mutationKey = getFinishRoundMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof finishRound>>, FinishRoundMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  finishRound(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FinishRoundMutationResult = NonNullable<Awaited<ReturnType<typeof finishRound>>>
+
+    export type FinishRoundMutationError = unknown
+    export type FinishRoundMutationVariables = {id: number}
+
+    export const useFinishRound = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finishRound>>, TError,FinishRoundMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof finishRound>>,
+        TError,
+        FinishRoundMutationVariables,
+        TContext
+      > => {
+      return useMutation(getFinishRoundMutationOptions(options), queryClient);
+    }
+
+export const getStartRoundUrl = (id: number,) => {
+
+
+
+
+  return `/api/orders/rounds/${id}/start`
+}
+
+export const startRound = async (id: number, options?: Parameters<typeof request>[1]): Promise<void> => {
+
+  return request<void>(getStartRoundUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+
+
+  }
+);}
+
+
+
+
+
+export const getStartRoundMutationKey = () => ['startRound'] as const;
+
+export const getStartRoundMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startRound>>, TError,StartRoundMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof startRound>>, TError,StartRoundMutationVariables, TContext> => {
+
+const mutationKey = getStartRoundMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startRound>>, StartRoundMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  startRound(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StartRoundMutationResult = NonNullable<Awaited<ReturnType<typeof startRound>>>
+
+    export type StartRoundMutationError = unknown
+    export type StartRoundMutationVariables = {id: number}
+
+    export const useStartRound = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startRound>>, TError,StartRoundMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof startRound>>,
+        TError,
+        StartRoundMutationVariables,
+        TContext
+      > => {
+      return useMutation(getStartRoundMutationOptions(options), queryClient);
+    }
+
+export const getGetTodayOrdersUrl = () => {
+
+
+
+
+  return `/api/orders/today`
+}
+
+export const getTodayOrders = async ( options?: Parameters<typeof request>[1]): Promise<OrderView[]> => {
+
+  return request<OrderView[]>(getGetTodayOrdersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTodayOrdersQueryKey = () => {
+    return [
+    `/api/orders/today`
+    ] as const;
+    }
+
+
+export const getGetTodayOrdersQueryOptions = <TData = Awaited<ReturnType<typeof getTodayOrders>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTodayOrders>>, TError, TData>>, request?: SecondParameter<typeof request>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTodayOrdersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTodayOrders>>> = ({ signal }) => getTodayOrders({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTodayOrders>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTodayOrdersQueryResult = NonNullable<Awaited<ReturnType<typeof getTodayOrders>>>
+export type GetTodayOrdersQueryError = unknown
+
+
+export function useGetTodayOrders<TData = Awaited<ReturnType<typeof getTodayOrders>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTodayOrders>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTodayOrders>>,
+          TError,
+          Awaited<ReturnType<typeof getTodayOrders>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTodayOrders<TData = Awaited<ReturnType<typeof getTodayOrders>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTodayOrders>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTodayOrders>>,
+          TError,
+          Awaited<ReturnType<typeof getTodayOrders>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTodayOrders<TData = Awaited<ReturnType<typeof getTodayOrders>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTodayOrders>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTodayOrders<TData = Awaited<ReturnType<typeof getTodayOrders>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTodayOrders>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTodayOrdersQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetTrackingUrl = (token: string,) => {
+
+
+
+
+  return `/api/orders/tracking/${token}`
+}
+
+export const getTracking = async (token: string, options?: Parameters<typeof request>[1]): Promise<OrderView> => {
+
+  return request<OrderView>(getGetTrackingUrl(token),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTrackingQueryKey = (token: string,) => {
+    return [
+    `/api/orders/tracking/${token}`
+    ] as const;
+    }
+
+
+export const getGetTrackingQueryOptions = <TData = Awaited<ReturnType<typeof getTracking>>, TError = unknown>(token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTracking>>, TError, TData>>, request?: SecondParameter<typeof request>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrackingQueryKey(token);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTracking>>> = ({ signal }) => getTracking(token, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: token !== null && token !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTracking>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTrackingQueryResult = NonNullable<Awaited<ReturnType<typeof getTracking>>>
+export type GetTrackingQueryError = unknown
+
+
+export function useGetTracking<TData = Awaited<ReturnType<typeof getTracking>>, TError = unknown>(
+ token: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTracking>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTracking>>,
+          TError,
+          Awaited<ReturnType<typeof getTracking>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTracking<TData = Awaited<ReturnType<typeof getTracking>>, TError = unknown>(
+ token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTracking>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTracking>>,
+          TError,
+          Awaited<ReturnType<typeof getTracking>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTracking<TData = Awaited<ReturnType<typeof getTracking>>, TError = unknown>(
+ token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTracking>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTracking<TData = Awaited<ReturnType<typeof getTracking>>, TError = unknown>(
+ token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTracking>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTrackingQueryOptions(token,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCloseOrderUrl = (id: number,) => {
+
+
+
+
+  return `/api/orders/${id}/close`
+}
+
+export const closeOrder = async (id: number,
+    closing: Closing, options?: Parameters<typeof request>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return request<void>(getCloseOrderUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(closing)
+  }
+);}
+
+
+
+
+
+export const getCloseOrderMutationKey = () => ['closeOrder'] as const;
+
+export const getCloseOrderMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeOrder>>, TError,CloseOrderMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof closeOrder>>, TError,CloseOrderMutationVariables, TContext> => {
+
+const mutationKey = getCloseOrderMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof closeOrder>>, CloseOrderMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  closeOrder(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CloseOrderMutationResult = NonNullable<Awaited<ReturnType<typeof closeOrder>>>
+    export type CloseOrderMutationBody = Closing
+    export type CloseOrderMutationError = unknown
+    export type CloseOrderMutationVariables = {id: number;data: Closing}
+
+    export const useCloseOrder = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeOrder>>, TError,CloseOrderMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof closeOrder>>,
+        TError,
+        CloseOrderMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCloseOrderMutationOptions(options), queryClient);
     }
 
 export const getGetScheduleUrl = () => {

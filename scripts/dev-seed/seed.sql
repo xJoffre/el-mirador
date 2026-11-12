@@ -5,7 +5,7 @@ set client_min_messages = warning;
 
 begin;
 
-truncate menu_category, lunch_dish, daily_menu, weekly_hours, hours_override, store_status_change, staff_user restart identity cascade;
+truncate customer_order, menu_category, lunch_dish, daily_menu, weekly_hours, hours_override, store_status_change, staff_user restart identity cascade;
 
 create function pg_temp.es(text) returns jsonb language sql immutable strict as $$ select jsonb_build_object('es', $1) $$;
 

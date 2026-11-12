@@ -1,27 +1,12 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import { client, signIn } from './client.ts'
 import { GetMenuResponse, GetScheduleResponse } from '../../web/src/shared/api/schemas.ts'
 
 const base = process.argv[2] ?? 'http://localhost:8080'
 
-const cookies = new Map<string, string>()
-const call = async (method: string, path: string, body?: unknown) => {
-  const response = await fetch(`${base}${path}`, {
-    method,
-    headers: {
-      cookie: [...cookies].map(([name, value]) => `${name}=${value}`).join('; '),
-      'x-xsrf-token': cookies.get('XSRF-TOKEN') ?? '',
-      'content-type': 'application/json',
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  })
-  for (const cookie of response.headers.getSetCookie()) {
-    const [name, value] = cookie.split(';')[0].split('=')
-    cookies.set(name, value)
-  }
-  return response
-}
+const call = client(base)
 
 const stream = await fetch(`${base}/api/events`)
 const reader = stream.body!.pipeThrough(new TextDecoderStream()).getReader()
@@ -41,10 +26,9 @@ const menu = async () => GetMenuResponse.parse(await (await fetch(`${base}/api/m
 const schedule = async () => GetScheduleResponse.parse(await (await fetch(`${base}/api/schedule`)).json())
 
 try {
-  const members: { id: number; name: string }[] = await (await call('GET', '/api/staff/members')).json()
-  await call('POST', '/api/staff/session', { staff_id: members.find((member) => member.name === 'Encargada')!.id, pin: '123456' })
+  await signIn(call, 'Encargada', '123456')
   const { date } = await schedule()
-  const dishes: { id: number; kind: string }[] = await (await call('GET', '/api/menu/lunch-dishes')).json()
+  const dishes: { id: number; kind: string }[] = (await call('GET', '/api/menu/lunch-dishes')).body
 
   const soup = dishes.find((dish) => dish.kind === 'soup')!
   const main = dishes.find((dish) => dish.kind === 'main')!

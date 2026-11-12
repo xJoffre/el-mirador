@@ -559,6 +559,172 @@
         "tags" : [ "catalog-controller" ]
       }
     },
+    "/api/orders" : {
+      "post" : {
+        "operationId" : "placeOrder",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/NewOrder"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Placed"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "order-controller" ]
+      }
+    },
+    "/api/orders/kitchen" : {
+      "get" : {
+        "operationId" : "getKitchen",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/KitchenTicket"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "order-controller" ]
+      }
+    },
+    "/api/orders/rounds/{id}/ready" : {
+      "put" : {
+        "operationId" : "finishRound",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "order-controller" ]
+      }
+    },
+    "/api/orders/rounds/{id}/start" : {
+      "put" : {
+        "operationId" : "startRound",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "order-controller" ]
+      }
+    },
+    "/api/orders/today" : {
+      "get" : {
+        "operationId" : "getTodayOrders",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/OrderView"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "order-controller" ]
+      }
+    },
+    "/api/orders/tracking/{token}" : {
+      "get" : {
+        "operationId" : "getTracking",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "token",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OrderView"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "order-controller" ]
+      }
+    },
+    "/api/orders/{id}/close" : {
+      "post" : {
+        "operationId" : "closeOrder",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Closing"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "order-controller" ]
+      }
+    },
     "/api/schedule" : {
       "get" : {
         "operationId" : "getSchedule",
@@ -1012,6 +1178,19 @@
         },
         "required" : [ "description", "icon", "name" ]
       },
+      "Closing" : {
+        "type" : "object",
+        "properties" : {
+          "payments" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/NewPayment"
+            },
+            "minItems" : 1
+          }
+        },
+        "required" : [ "payments" ]
+      },
       "DailyDish" : {
         "type" : "object",
         "properties" : {
@@ -1065,6 +1244,103 @@
           }
         },
         "required" : [ "closes_at", "lunch_ends_at", "lunch_starts_at", "opens_at" ]
+      },
+      "KitchenTicket" : {
+        "type" : "object",
+        "properties" : {
+          "created_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "customer_name" : {
+            "type" : "string"
+          },
+          "delivery_address" : {
+            "type" : [ "string", "null" ]
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LineView"
+            }
+          },
+          "note" : {
+            "type" : [ "string", "null" ]
+          },
+          "order_id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "round_id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "started_at" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time"
+          }
+        },
+        "required" : [ "created_at", "customer_name", "delivery_address", "lines", "note", "order_id", "round_id", "started_at" ]
+      },
+      "LineView" : {
+        "type" : "object",
+        "properties" : {
+          "currency" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "kind" : {
+            "type" : "string",
+            "enum" : [ "product", "lunch_full", "lunch_soup", "lunch_main" ]
+          },
+          "main" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "note" : {
+            "type" : [ "string", "null" ]
+          },
+          "options" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "additionalProperties" : {
+                "type" : "string"
+              }
+            }
+          },
+          "product" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "quantity" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "soup" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "unit_price" : {
+            "type" : "number"
+          },
+          "variant" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          }
+        },
+        "required" : [ "currency", "id", "kind", "main", "note", "options", "product", "quantity", "soup", "unit_price", "variant" ]
       },
       "LunchDish" : {
         "type" : "object",
@@ -1202,6 +1478,93 @@
         },
         "required" : [ "categories", "lunch", "lunch_includes" ]
       },
+      "NewLine" : {
+        "type" : "object",
+        "properties" : {
+          "kind" : {
+            "type" : "string",
+            "enum" : [ "product", "lunch_full", "lunch_soup", "lunch_main" ]
+          },
+          "main_dish_id" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "note" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "option_item_ids" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            }
+          },
+          "product_variant_id" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "quantity" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1
+          },
+          "soup_dish_id" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          }
+        },
+        "required" : [ "kind", "main_dish_id", "note", "option_item_ids", "product_variant_id", "quantity", "soup_dish_id" ]
+      },
+      "NewOrder" : {
+        "type" : "object",
+        "properties" : {
+          "customer_name" : {
+            "type" : "string",
+            "maxLength" : 80,
+            "minLength" : 0
+          },
+          "customer_phone" : {
+            "type" : "string",
+            "pattern" : "[0-9]{7,15}"
+          },
+          "delivery_address" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 300,
+            "minLength" : 0
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/NewLine"
+            },
+            "maxItems" : 40,
+            "minItems" : 0
+          },
+          "note" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 300,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "customer_name", "customer_phone", "delivery_address", "lines", "note" ]
+      },
+      "NewPayment" : {
+        "type" : "object",
+        "properties" : {
+          "amount" : {
+            "type" : "number",
+            "minimum" : 0.01
+          },
+          "method" : {
+            "type" : "string",
+            "enum" : [ "cash", "transfer" ]
+          }
+        },
+        "required" : [ "amount", "method" ]
+      },
       "NewUser" : {
         "type" : "object",
         "properties" : {
@@ -1338,6 +1701,55 @@
         },
         "required" : [ "ids" ]
       },
+      "OrderView" : {
+        "type" : "object",
+        "properties" : {
+          "created_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "currency" : {
+            "type" : "string"
+          },
+          "customer_name" : {
+            "type" : "string"
+          },
+          "customer_phone" : {
+            "type" : "string"
+          },
+          "delivery_address" : {
+            "type" : [ "string", "null" ]
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LineView"
+            }
+          },
+          "note" : {
+            "type" : [ "string", "null" ]
+          },
+          "paid" : {
+            "type" : "number"
+          },
+          "ready_at" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time"
+          },
+          "state" : {
+            "type" : "string",
+            "enum" : [ "received", "preparing", "ready", "delivered", "cancelled" ]
+          },
+          "total" : {
+            "type" : "number"
+          }
+        },
+        "required" : [ "created_at", "currency", "customer_name", "customer_phone", "delivery_address", "id", "lines", "note", "paid", "ready_at", "state", "total" ]
+      },
       "Photo" : {
         "type" : "object",
         "properties" : {
@@ -1346,6 +1758,25 @@
           }
         },
         "required" : [ "photo" ]
+      },
+      "Placed" : {
+        "type" : "object",
+        "properties" : {
+          "currency" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "total" : {
+            "type" : "number"
+          },
+          "tracking_token" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "currency", "id", "total", "tracking_token" ]
       },
       "Product" : {
         "type" : "object",

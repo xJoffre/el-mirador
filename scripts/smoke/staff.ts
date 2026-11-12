@@ -2,32 +2,9 @@ import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { crc32, deflateSync } from 'node:zlib'
+import { client, signIn } from './client.ts'
 
 const base = process.argv[2] ?? 'http://localhost:8080'
-
-function client() {
-  const cookies = new Map<string, string>()
-  return async (method: string, path: string, body?: unknown) => {
-    const form = body instanceof FormData
-    const response = await fetch(`${base}${path}`, {
-      method,
-      headers: {
-        cookie: [...cookies].map(([name, value]) => `${name}=${value}`).join('; '),
-        'x-xsrf-token': cookies.get('XSRF-TOKEN') ?? '',
-        ...(body && !form ? { 'content-type': 'application/json' } : {}),
-      },
-      body: form ? body : body ? JSON.stringify(body) : undefined,
-    })
-    for (const cookie of response.headers.getSetCookie()) {
-      const [pair] = cookie.split(';')
-      const [name, value] = pair.split('=')
-      if (/max-age=0/i.test(cookie)) cookies.delete(name)
-      else cookies.set(name, value)
-    }
-    const text = await response.text()
-    return { status: response.status, body: text && response.headers.get('content-type')?.includes('json') ? JSON.parse(text) : text }
-  }
-}
 
 function png(width: number, height: number) {
   const chunk = (type: string, data: Buffer) => {
@@ -59,13 +36,9 @@ function jpegWidth(jpeg: Buffer) {
   throw new Error('not a jpeg')
 }
 
-const anyone = client()
+const anyone = client(base)
 const members: { id: number; name: string }[] = (await anyone('GET', '/api/staff/members')).body
 const idOf = (name: string) => members.find((member) => member.name === name)!.id
-const signIn = async (call: ReturnType<typeof client>, name: string, pin: string) => {
-  await call('GET', '/api/staff/members')
-  return call('POST', '/api/staff/session', { staff_id: idOf(name), pin })
-}
 const publicProduct = async (id: number) =>
   (await anyone('GET', '/api/menu')).body.categories.flatMap((category: { products: { id: number }[] }) => category.products).find((product: { id: number }) => product.id === id)
 
@@ -75,7 +48,7 @@ try {
   assert.deepEqual(statuses, [401, 401, 401, 401, 423], 'five wrong PINs lock the user')
   assert.equal((await signIn(anyone, 'Cocina', '333333')).status, 423, 'a locked user cannot sign in even with the right PIN')
 
-  const waiter = client()
+  const waiter = client(base)
   assert.equal((await waiter('POST', '/api/staff/session', { staff_id: idOf('Mesero'), pin: '222222' })).status, 403, 'a form without the CSRF token is refused')
   assert.equal((await signIn(waiter, 'Mesero', '222222')).status, 200, 'the waiter signs in')
   assert.equal((await waiter('GET', '/api/menu/catalog')).status, 403, 'a waiter cannot edit the menu')
@@ -84,7 +57,7 @@ try {
   assert.equal((await waiter('DELETE', '/api/staff/session')).status, 204, 'the waiter signs out')
   assert.equal((await waiter('GET', '/api/staff/session')).status, 401, 'after signing out there is no session')
 
-  const manager = client()
+  const manager = client(base)
   assert.equal((await signIn(manager, 'Encargada', '123456')).status, 200, 'the manager signs in')
   const form = {
     category_id: 1,
@@ -130,7 +103,7 @@ try {
   assert.equal((await manager('POST', '/api/staff/users', { name: 'Otra', role: 'floor', pin: '12' })).status, 400, 'a PIN has six digits')
   assert.equal((await manager('PUT', `/api/staff/users/${idOf('Encargada')}`, { name: 'Encargada', role: 'floor', active: true, pin: null })).body.code, 'staff.ownAccess', 'nobody removes their own role')
 
-  const newcomerSession = client()
+  const newcomerSession = client(base)
   await newcomerSession('GET', '/api/staff/members')
   assert.equal((await newcomerSession('POST', '/api/staff/session', { staff_id: newcomer.body.id, pin: '444444' })).status, 200, 'the new waiter signs in')
   await manager('PUT', `/api/staff/users/${newcomer.body.id}`, { name: 'Prueba', role: 'floor', active: false, pin: null })

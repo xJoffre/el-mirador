@@ -6,7 +6,9 @@
     "catalog": "Carta",
     "store": "Local",
     "users": "Usuarios",
-    "soldOut": "Agotados"
+    "soldOut": "Agotados",
+    "orders": "Pedidos",
+    "kitchen": "Cocina"
   },
   "roles": {
     "admin": "Encargada",

@@ -32,3 +32,5 @@ export const weekdayName = (isoDay: number) =>
 
 export const clock = (time: string | null | undefined) =>
   time ? new Intl.DateTimeFormat(undefined, { timeStyle: 'short' }).format(new Date(`1970-01-01T${time}`)) : ''
+
+export const emptyIsNull = { setValueAs: (value: string | null) => (value?.trim() ? value : null) }

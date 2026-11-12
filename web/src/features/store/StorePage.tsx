@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useSaved } from '@/features/panel/useSaved'
 import { getGetScheduleQueryKey, useGetSchedule, useSaveProfile, useSaveWeek, type Hours, type StoreProfile } from '@/shared/api/client'
 import { SaveProfileBody } from '@/shared/api/schemas'
+import { emptyIsNull } from '@/shared/lib/format'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
@@ -13,7 +14,6 @@ import { Textarea } from '@/shared/ui/textarea'
 
 const WEEKDAYS = ['1', '2', '3', '4', '5', '6', '7'] as const
 const CLOSED: Hours = { opens_at: null, closes_at: null, lunch_starts_at: null, lunch_ends_at: null }
-const emptyIsNull = { setValueAs: (value: string) => (value === '' ? null : value) }
 const minutes = (time: string | null) => time?.slice(0, 5) ?? ''
 
 export function StorePage() {
