@@ -196,6 +196,69 @@ export interface Hours {
   opens_at: string | null;
 }
 
+export type LunchDishKind = typeof LunchDishKind[keyof typeof LunchDishKind];
+
+
+export const LunchDishKind = {
+  soup: 'soup',
+  main: 'main',
+} as const;
+
+export type LunchDishName = {[key: string]: string};
+
+export interface LunchDish {
+  hidden: boolean;
+  id: number;
+  kind: LunchDishKind;
+  name: LunchDishName;
+}
+
+export type LunchDishFormKind = typeof LunchDishFormKind[keyof typeof LunchDishFormKind];
+
+
+export const LunchDishFormKind = {
+  soup: 'soup',
+  main: 'main',
+} as const;
+
+export type LunchDishFormName = {[key: string]: string};
+
+export interface LunchDishForm {
+  hidden: boolean;
+  kind: LunchDishFormKind;
+  name: LunchDishFormName;
+}
+
+export interface LunchDishPrice {
+  lunch_dish_id: number;
+  /** @minimum 0 */
+  price_alone: number;
+  /**
+     * @minimum 0
+     * @nullable
+     */
+  price_full: number | null;
+}
+
+export type LunchFormIncludes = {[key: string]: string};
+
+export interface LunchForm {
+  /** @minItems 1 */
+  dishes: LunchDishPrice[];
+  includes: LunchFormIncludes;
+}
+
+/**
+ * @nullable
+ */
+export type LunchPlanIncludes = {[key: string]: string} | null;
+
+export interface LunchPlan {
+  dishes: DailyDish[];
+  /** @nullable */
+  includes: LunchPlanIncludes;
+}
+
 export interface Member {
   id: number;
   name: string;
@@ -335,11 +398,15 @@ export interface Status {
   status: StatusStatus;
   /** @nullable */
   until_at: string | null;
-  /** @nullable */
+  /**
+     * @exclusiveMinimum 0
+     * @nullable
+     */
   wait_minutes: number | null;
 }
 
 export interface Schedule {
+  date: string;
   lunch_now: boolean;
   profile: StoreProfile;
   status: Status;
@@ -1026,6 +1093,595 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getOrderProductsMutationOptions(options), queryClient);
+    }
+
+export const getGetLunchDishesUrl = () => {
+
+
+
+
+  return `/api/menu/lunch-dishes`
+}
+
+export const getLunchDishes = async ( options?: Parameters<typeof request>[1]): Promise<LunchDish[]> => {
+
+  return request<LunchDish[]>(getGetLunchDishesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetLunchDishesQueryKey = () => {
+    return [
+    `/api/menu/lunch-dishes`
+    ] as const;
+    }
+
+
+export const getGetLunchDishesQueryOptions = <TData = Awaited<ReturnType<typeof getLunchDishes>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLunchDishes>>, TError, TData>>, request?: SecondParameter<typeof request>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetLunchDishesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLunchDishes>>> = ({ signal }) => getLunchDishes({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLunchDishes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetLunchDishesQueryResult = NonNullable<Awaited<ReturnType<typeof getLunchDishes>>>
+export type GetLunchDishesQueryError = unknown
+
+
+export function useGetLunchDishes<TData = Awaited<ReturnType<typeof getLunchDishes>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLunchDishes>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLunchDishes>>,
+          TError,
+          Awaited<ReturnType<typeof getLunchDishes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLunchDishes<TData = Awaited<ReturnType<typeof getLunchDishes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLunchDishes>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLunchDishes>>,
+          TError,
+          Awaited<ReturnType<typeof getLunchDishes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLunchDishes<TData = Awaited<ReturnType<typeof getLunchDishes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLunchDishes>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLunchDishes<TData = Awaited<ReturnType<typeof getLunchDishes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLunchDishes>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetLunchDishesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateLunchDishUrl = () => {
+
+
+
+
+  return `/api/menu/lunch-dishes`
+}
+
+export const createLunchDish = async (lunchDishForm: LunchDishForm, options?: Parameters<typeof request>[1]): Promise<Saved> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return request<Saved>(getCreateLunchDishUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(lunchDishForm)
+  }
+);}
+
+
+
+
+
+export const getCreateLunchDishMutationKey = () => ['createLunchDish'] as const;
+
+export const getCreateLunchDishMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createLunchDish>>, TError,CreateLunchDishMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof createLunchDish>>, TError,CreateLunchDishMutationVariables, TContext> => {
+
+const mutationKey = getCreateLunchDishMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createLunchDish>>, CreateLunchDishMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createLunchDish(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateLunchDishMutationResult = NonNullable<Awaited<ReturnType<typeof createLunchDish>>>
+    export type CreateLunchDishMutationBody = LunchDishForm
+    export type CreateLunchDishMutationError = unknown
+    export type CreateLunchDishMutationVariables = {data: LunchDishForm}
+
+    export const useCreateLunchDish = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createLunchDish>>, TError,CreateLunchDishMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createLunchDish>>,
+        TError,
+        CreateLunchDishMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateLunchDishMutationOptions(options), queryClient);
+    }
+
+export const getUpdateLunchDishUrl = (id: number,) => {
+
+
+
+
+  return `/api/menu/lunch-dishes/${id}`
+}
+
+export const updateLunchDish = async (id: number,
+    lunchDishForm: LunchDishForm, options?: Parameters<typeof request>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return request<void>(getUpdateLunchDishUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(lunchDishForm)
+  }
+);}
+
+
+
+
+
+export const getUpdateLunchDishMutationKey = () => ['updateLunchDish'] as const;
+
+export const getUpdateLunchDishMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateLunchDish>>, TError,UpdateLunchDishMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateLunchDish>>, TError,UpdateLunchDishMutationVariables, TContext> => {
+
+const mutationKey = getUpdateLunchDishMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateLunchDish>>, UpdateLunchDishMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateLunchDish(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateLunchDishMutationResult = NonNullable<Awaited<ReturnType<typeof updateLunchDish>>>
+    export type UpdateLunchDishMutationBody = LunchDishForm
+    export type UpdateLunchDishMutationError = unknown
+    export type UpdateLunchDishMutationVariables = {id: number;data: LunchDishForm}
+
+    export const useUpdateLunchDish = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateLunchDish>>, TError,UpdateLunchDishMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateLunchDish>>,
+        TError,
+        UpdateLunchDishMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateLunchDishMutationOptions(options), queryClient);
+    }
+
+export const getUnpublishLunchUrl = (date: string,) => {
+
+
+
+
+  return `/api/menu/lunch/${date}`
+}
+
+export const unpublishLunch = async (date: string, options?: Parameters<typeof request>[1]): Promise<void> => {
+
+  return request<void>(getUnpublishLunchUrl(date),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getUnpublishLunchMutationKey = () => ['unpublishLunch'] as const;
+
+export const getUnpublishLunchMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unpublishLunch>>, TError,UnpublishLunchMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof unpublishLunch>>, TError,UnpublishLunchMutationVariables, TContext> => {
+
+const mutationKey = getUnpublishLunchMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unpublishLunch>>, UnpublishLunchMutationVariables> = (props) => {
+          const {date} = props ?? {};
+
+          return  unpublishLunch(date,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnpublishLunchMutationResult = NonNullable<Awaited<ReturnType<typeof unpublishLunch>>>
+
+    export type UnpublishLunchMutationError = unknown
+    export type UnpublishLunchMutationVariables = {date: string}
+
+    export const useUnpublishLunch = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unpublishLunch>>, TError,UnpublishLunchMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof unpublishLunch>>,
+        TError,
+        UnpublishLunchMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUnpublishLunchMutationOptions(options), queryClient);
+    }
+
+export const getGetLunchUrl = (date: string,) => {
+
+
+
+
+  return `/api/menu/lunch/${date}`
+}
+
+export const getLunch = async (date: string, options?: Parameters<typeof request>[1]): Promise<LunchPlan> => {
+
+  return request<LunchPlan>(getGetLunchUrl(date),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetLunchQueryKey = (date: string,) => {
+    return [
+    `/api/menu/lunch/${date}`
+    ] as const;
+    }
+
+
+export const getGetLunchQueryOptions = <TData = Awaited<ReturnType<typeof getLunch>>, TError = unknown>(date: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLunch>>, TError, TData>>, request?: SecondParameter<typeof request>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetLunchQueryKey(date);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLunch>>> = ({ signal }) => getLunch(date, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: date !== null && date !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLunch>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetLunchQueryResult = NonNullable<Awaited<ReturnType<typeof getLunch>>>
+export type GetLunchQueryError = unknown
+
+
+export function useGetLunch<TData = Awaited<ReturnType<typeof getLunch>>, TError = unknown>(
+ date: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLunch>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLunch>>,
+          TError,
+          Awaited<ReturnType<typeof getLunch>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLunch<TData = Awaited<ReturnType<typeof getLunch>>, TError = unknown>(
+ date: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLunch>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLunch>>,
+          TError,
+          Awaited<ReturnType<typeof getLunch>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLunch<TData = Awaited<ReturnType<typeof getLunch>>, TError = unknown>(
+ date: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLunch>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLunch<TData = Awaited<ReturnType<typeof getLunch>>, TError = unknown>(
+ date: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLunch>>, TError, TData>>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetLunchQueryOptions(date,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getPublishLunchUrl = (date: string,) => {
+
+
+
+
+  return `/api/menu/lunch/${date}`
+}
+
+export const publishLunch = async (date: string,
+    lunchForm: LunchForm, options?: Parameters<typeof request>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return request<void>(getPublishLunchUrl(date),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(lunchForm)
+  }
+);}
+
+
+
+
+
+export const getPublishLunchMutationKey = () => ['publishLunch'] as const;
+
+export const getPublishLunchMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishLunch>>, TError,PublishLunchMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof publishLunch>>, TError,PublishLunchMutationVariables, TContext> => {
+
+const mutationKey = getPublishLunchMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publishLunch>>, PublishLunchMutationVariables> = (props) => {
+          const {date,data} = props ?? {};
+
+          return  publishLunch(date,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PublishLunchMutationResult = NonNullable<Awaited<ReturnType<typeof publishLunch>>>
+    export type PublishLunchMutationBody = LunchForm
+    export type PublishLunchMutationError = unknown
+    export type PublishLunchMutationVariables = {date: string;data: LunchForm}
+
+    export const usePublishLunch = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishLunch>>, TError,PublishLunchMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof publishLunch>>,
+        TError,
+        PublishLunchMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPublishLunchMutationOptions(options), queryClient);
+    }
+
+export const getMarkLunchDishSoldOutUrl = (date: string,
+    id: number,) => {
+
+
+
+
+  return `/api/menu/lunch/${date}/dishes/${id}/sold-out`
+}
+
+export const markLunchDishSoldOut = async (date: string,
+    id: number,
+    soldOut: SoldOut, options?: Parameters<typeof request>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return request<void>(getMarkLunchDishSoldOutUrl(date,id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(soldOut)
+  }
+);}
+
+
+
+
+
+export const getMarkLunchDishSoldOutMutationKey = () => ['markLunchDishSoldOut'] as const;
+
+export const getMarkLunchDishSoldOutMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markLunchDishSoldOut>>, TError,MarkLunchDishSoldOutMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof markLunchDishSoldOut>>, TError,MarkLunchDishSoldOutMutationVariables, TContext> => {
+
+const mutationKey = getMarkLunchDishSoldOutMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markLunchDishSoldOut>>, MarkLunchDishSoldOutMutationVariables> = (props) => {
+          const {date,id,data} = props ?? {};
+
+          return  markLunchDishSoldOut(date,id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MarkLunchDishSoldOutMutationResult = NonNullable<Awaited<ReturnType<typeof markLunchDishSoldOut>>>
+    export type MarkLunchDishSoldOutMutationBody = SoldOut
+    export type MarkLunchDishSoldOutMutationError = unknown
+    export type MarkLunchDishSoldOutMutationVariables = {date: string;id: number;data: SoldOut}
+
+    export const useMarkLunchDishSoldOut = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markLunchDishSoldOut>>, TError,MarkLunchDishSoldOutMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof markLunchDishSoldOut>>,
+        TError,
+        MarkLunchDishSoldOutMutationVariables,
+        TContext
+      > => {
+      return useMutation(getMarkLunchDishSoldOutMutationOptions(options), queryClient);
     }
 
 export const getMarkOptionItemSoldOutUrl = (id: number,) => {
@@ -1745,6 +2401,238 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getSaveProfileMutationOptions(options), queryClient);
+    }
+
+export const getSetStatusUrl = () => {
+
+
+
+
+  return `/api/schedule/status`
+}
+
+export const setStatus = async (status: Status, options?: Parameters<typeof request>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return request<void>(getSetStatusUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(status)
+  }
+);}
+
+
+
+
+
+export const getSetStatusMutationKey = () => ['setStatus'] as const;
+
+export const getSetStatusMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setStatus>>, TError,SetStatusMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof setStatus>>, TError,SetStatusMutationVariables, TContext> => {
+
+const mutationKey = getSetStatusMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setStatus>>, SetStatusMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  setStatus(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetStatusMutationResult = NonNullable<Awaited<ReturnType<typeof setStatus>>>
+    export type SetStatusMutationBody = Status
+    export type SetStatusMutationError = unknown
+    export type SetStatusMutationVariables = {data: Status}
+
+    export const useSetStatus = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setStatus>>, TError,SetStatusMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof setStatus>>,
+        TError,
+        SetStatusMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSetStatusMutationOptions(options), queryClient);
+    }
+
+export const getKeepTodayAsUsualUrl = () => {
+
+
+
+
+  return `/api/schedule/today`
+}
+
+export const keepTodayAsUsual = async ( options?: Parameters<typeof request>[1]): Promise<void> => {
+
+  return request<void>(getKeepTodayAsUsualUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getKeepTodayAsUsualMutationKey = () => ['keepTodayAsUsual'] as const;
+
+export const getKeepTodayAsUsualMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof keepTodayAsUsual>>, TError,void, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof keepTodayAsUsual>>, TError,void, TContext> => {
+
+const mutationKey = getKeepTodayAsUsualMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof keepTodayAsUsual>>, void> = () => {
+
+
+          return  keepTodayAsUsual(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type KeepTodayAsUsualMutationResult = NonNullable<Awaited<ReturnType<typeof keepTodayAsUsual>>>
+
+    export type KeepTodayAsUsualMutationError = unknown
+
+
+    export const useKeepTodayAsUsual = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof keepTodayAsUsual>>, TError,void, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof keepTodayAsUsual>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getKeepTodayAsUsualMutationOptions(options), queryClient);
+    }
+
+export const getChangeTodayUrl = () => {
+
+
+
+
+  return `/api/schedule/today`
+}
+
+export const changeToday = async (hours: Hours, options?: Parameters<typeof request>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return request<void>(getChangeTodayUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(hours)
+  }
+);}
+
+
+
+
+
+export const getChangeTodayMutationKey = () => ['changeToday'] as const;
+
+export const getChangeTodayMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof changeToday>>, TError,ChangeTodayMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+): UseMutationOptions<Awaited<ReturnType<typeof changeToday>>, TError,ChangeTodayMutationVariables, TContext> => {
+
+const mutationKey = getChangeTodayMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof changeToday>>, ChangeTodayMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  changeToday(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChangeTodayMutationResult = NonNullable<Awaited<ReturnType<typeof changeToday>>>
+    export type ChangeTodayMutationBody = Hours
+    export type ChangeTodayMutationError = unknown
+    export type ChangeTodayMutationVariables = {data: Hours}
+
+    export const useChangeToday = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof changeToday>>, TError,ChangeTodayMutationVariables, TContext>, request?: SecondParameter<typeof request>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof changeToday>>,
+        TError,
+        ChangeTodayMutationVariables,
+        TContext
+      > => {
+      return useMutation(getChangeTodayMutationOptions(options), queryClient);
     }
 
 export const getSaveWeekUrl = () => {

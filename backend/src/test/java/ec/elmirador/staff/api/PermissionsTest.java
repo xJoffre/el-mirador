@@ -4,11 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,6 +25,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import ec.elmirador.menu.domain.CatalogService;
+import ec.elmirador.menu.domain.LunchService;
 import ec.elmirador.menu.domain.MenuService;
 import ec.elmirador.schedule.domain.ScheduleService;
 import ec.elmirador.shared.AppProperties;
@@ -55,6 +57,9 @@ class PermissionsTest {
 	private ScheduleService schedule;
 
 	@MockitoBean
+	private LunchService lunches;
+
+	@MockitoBean
 	private EventStream events;
 
 	static Stream<Arguments> routes() {
@@ -70,6 +75,16 @@ class PermissionsTest {
 				Arguments.of(HttpMethod.DELETE, "/api/staff/session", staff),
 				Arguments.of(HttpMethod.PUT, "/api/menu/products/1/sold-out", staff),
 				Arguments.of(HttpMethod.PUT, "/api/menu/option-items/1/sold-out", staff),
+				Arguments.of(HttpMethod.PUT, "/api/menu/lunch/2026-11-14/dishes/1/sold-out", staff),
+				Arguments.of(HttpMethod.GET, "/api/menu/lunch-dishes", admin),
+				Arguments.of(HttpMethod.POST, "/api/menu/lunch-dishes", admin),
+				Arguments.of(HttpMethod.PUT, "/api/menu/lunch-dishes/1", admin),
+				Arguments.of(HttpMethod.GET, "/api/menu/lunch/2026-11-14", admin),
+				Arguments.of(HttpMethod.PUT, "/api/menu/lunch/2026-11-14", admin),
+				Arguments.of(HttpMethod.DELETE, "/api/menu/lunch/2026-11-14", admin),
+				Arguments.of(HttpMethod.POST, "/api/schedule/status", admin),
+				Arguments.of(HttpMethod.PUT, "/api/schedule/today", admin),
+				Arguments.of(HttpMethod.DELETE, "/api/schedule/today", admin),
 				Arguments.of(HttpMethod.GET, "/api/menu/catalog", admin),
 				Arguments.of(HttpMethod.POST, "/api/menu/categories", admin),
 				Arguments.of(HttpMethod.PUT, "/api/menu/categories/1", admin),
@@ -96,7 +111,9 @@ class PermissionsTest {
 		for (var role : Stream.concat(Stream.of(ANONYMOUS), Arrays.stream(StaffRole.values()).map(Enum::name)).toList()) {
 			var call = request(method, path).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("{}");
 			if (!role.equals(ANONYMOUS)) {
-				call.with(user("someone").roles(role));
+				var session = new Session(1, "Rosa", StaffRole.valueOf(role));
+				given(staff.current(1)).willReturn(Optional.of(session));
+				call.with(authentication(StaffAuthentication.of(session)));
 			}
 			var status = http.perform(call).andReturn().getResponse().getStatus();
 

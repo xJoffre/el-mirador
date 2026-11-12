@@ -8,7 +8,9 @@ import java.util.Optional;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 
 public interface ScheduleRepository {
 
@@ -23,6 +25,12 @@ public interface ScheduleRepository {
 	void saveProfile(StoreProfile profile);
 
 	void saveWeek(Map<Integer, Hours> week);
+
+	void addStatus(Status status, long staffId);
+
+	void saveOverride(LocalDate date, Hours hours, long staffId);
+
+	boolean deleteOverride(LocalDate date);
 
 	record Hours(@Nullable LocalTime opensAt, @Nullable LocalTime closesAt, @Nullable LocalTime lunchStartsAt,
 			@Nullable LocalTime lunchEndsAt) {
@@ -49,7 +57,7 @@ public interface ScheduleRepository {
 
 	}
 
-	record Status(StoreStatus status, @Nullable Integer waitMinutes, @Nullable String reason,
+	record Status(@NotNull StoreStatus status, @Nullable @Positive Integer waitMinutes, @Nullable String reason,
 			@Nullable OffsetDateTime untilAt) {
 	}
 

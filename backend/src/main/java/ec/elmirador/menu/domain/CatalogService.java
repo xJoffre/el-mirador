@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +28,15 @@ public class CatalogService {
 
 	private final Clock clock;
 
-	public CatalogService(MenuRepository menu, CatalogRepository catalog, PhotoStore photos, Clock clock) {
+	private final ApplicationEventPublisher events;
+
+	public CatalogService(MenuRepository menu, CatalogRepository catalog, PhotoStore photos, Clock clock,
+			ApplicationEventPublisher events) {
 		this.menu = menu;
 		this.catalog = catalog;
 		this.photos = photos;
 		this.clock = clock;
+		this.events = events;
 	}
 
 	public List<CatalogCategory> catalog() {
@@ -39,7 +44,7 @@ public class CatalogService {
 	}
 
 	public long createCategory(CategoryForm form) {
-		return catalog.createCategory(form);
+		return changed(catalog.createCategory(form));
 	}
 
 	public void updateCategory(long id, CategoryForm form) {
@@ -53,16 +58,18 @@ public class CatalogService {
 	@Transactional
 	public void orderCategories(List<Long> ids) {
 		catalog.orderCategories(ids);
+		events.publishEvent(Menu.CHANGED);
 	}
 
 	@Transactional
 	public void orderProducts(long categoryId, List<Long> ids) {
 		catalog.orderProducts(categoryId, ids);
+		events.publishEvent(Menu.CHANGED);
 	}
 
 	@Transactional
 	public long createProduct(ProductForm form) {
-		return catalog.createProduct(form);
+		return changed(catalog.createProduct(form));
 	}
 
 	@Transactional
@@ -82,6 +89,7 @@ public class CatalogService {
 		var previous = photoOf(id);
 		var saved = photos.save(image).orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "menu.notAnImage"));
 		catalog.setPhoto(id, saved);
+		events.publishEvent(Menu.CHANGED);
 		if (previous.isPresent()) {
 			photos.delete(previous.get());
 		}
@@ -91,6 +99,7 @@ public class CatalogService {
 	public void removePhoto(long id) throws IOException {
 		var previous = photoOf(id);
 		catalog.setPhoto(id, null);
+		events.publishEvent(Menu.CHANGED);
 		if (previous.isPresent()) {
 			photos.delete(previous.get());
 		}
@@ -108,10 +117,16 @@ public class CatalogService {
 		return catalog.photo(productId).orElseThrow(CatalogService::notFound);
 	}
 
-	private static void found(boolean changed) {
+	private long changed(long id) {
+		events.publishEvent(Menu.CHANGED);
+		return id;
+	}
+
+	private void found(boolean changed) {
 		if (!changed) {
 			throw notFound();
 		}
+		events.publishEvent(Menu.CHANGED);
 	}
 
 	private static ApiException notFound() {

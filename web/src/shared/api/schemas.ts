@@ -142,6 +142,99 @@ export const OrderProductsBody = zod.object({
 export const OrderProductsResponse = zod.void()
 
 
+export const GetLunchDishesResponseItem = zod.object({
+  "hidden": zod.boolean(),
+  "id": zod.int(),
+  "kind": zod.enum(['soup', 'main']),
+  "name": zod.record(zod.string(), zod.string())
+})
+export const GetLunchDishesResponse = zod.array(GetLunchDishesResponseItem)
+
+
+export const CreateLunchDishBody = zod.object({
+  "hidden": zod.boolean(),
+  "kind": zod.enum(['soup', 'main']),
+  "name": zod.record(zod.string(), zod.string())
+})
+
+export const CreateLunchDishResponse = zod.object({
+  "id": zod.int()
+})
+
+
+export const UpdateLunchDishParams = zod.object({
+  "id": zod.int()
+})
+
+export const UpdateLunchDishBody = zod.object({
+  "hidden": zod.boolean(),
+  "kind": zod.enum(['soup', 'main']),
+  "name": zod.record(zod.string(), zod.string())
+})
+
+export const UpdateLunchDishResponse = zod.void()
+
+
+export const UnpublishLunchParams = zod.object({
+  "date": zod.iso.date()
+})
+
+export const UnpublishLunchResponse = zod.void()
+
+
+export const GetLunchParams = zod.object({
+  "date": zod.iso.date()
+})
+
+export const GetLunchResponse = zod.object({
+  "dishes": zod.array(zod.object({
+  "currency": zod.string(),
+  "id": zod.int(),
+  "kind": zod.enum(['soup', 'main']),
+  "name": zod.record(zod.string(), zod.string()),
+  "price_alone": zod.number(),
+  "price_full": zod.number().nullable(),
+  "sold_out": zod.boolean()
+})),
+  "includes": zod.record(zod.string(), zod.string()).nullable()
+})
+
+
+export const PublishLunchParams = zod.object({
+  "date": zod.iso.date()
+})
+
+export const publishLunchBodyDishesItemPriceAloneMin = 0;
+
+export const publishLunchBodyDishesItemPriceFullMin = 0;
+
+
+
+
+export const PublishLunchBody = zod.object({
+  "dishes": zod.array(zod.object({
+  "lunch_dish_id": zod.int(),
+  "price_alone": zod.number().min(publishLunchBodyDishesItemPriceAloneMin),
+  "price_full": zod.number().min(publishLunchBodyDishesItemPriceFullMin).nullable()
+})).min(1),
+  "includes": zod.record(zod.string(), zod.string())
+})
+
+export const PublishLunchResponse = zod.void()
+
+
+export const MarkLunchDishSoldOutParams = zod.object({
+  "date": zod.iso.date(),
+  "id": zod.int()
+})
+
+export const MarkLunchDishSoldOutBody = zod.object({
+  "sold_out": zod.boolean()
+})
+
+export const MarkLunchDishSoldOutResponse = zod.void()
+
+
 export const MarkOptionItemSoldOutParams = zod.object({
   "id": zod.int()
 })
@@ -271,9 +364,12 @@ export const MarkProductSoldOutResponse = zod.void()
 
 
 export const getScheduleResponseProfileWhatsappRegExp = new RegExp('[0-9]{8,15}');
+export const getScheduleResponseStatusWaitMinutesExclusiveMin = 0;
+
 
 
 export const GetScheduleResponse = zod.object({
+  "date": zod.iso.date(),
   "lunch_now": zod.boolean(),
   "profile": zod.object({
   "address": zod.string().nullable(),
@@ -286,7 +382,7 @@ export const GetScheduleResponse = zod.object({
   "reason": zod.string().nullable(),
   "status": zod.enum(['open', 'delayed', 'closed']),
   "until_at": zod.iso.datetime({"offset":true}).nullable(),
-  "wait_minutes": zod.int().nullable()
+  "wait_minutes": zod.int().gt(getScheduleResponseStatusWaitMinutesExclusiveMin).nullable()
 }),
   "today": zod.object({
   "closes_at": zod.iso.time({}).nullable(),
@@ -316,6 +412,33 @@ export const SaveProfileBody = zod.object({
 })
 
 export const SaveProfileResponse = zod.void()
+
+
+export const setStatusBodyWaitMinutesExclusiveMin = 0;
+
+
+
+export const SetStatusBody = zod.object({
+  "reason": zod.string().nullable(),
+  "status": zod.enum(['open', 'delayed', 'closed']),
+  "until_at": zod.iso.datetime({"offset":true}).nullable(),
+  "wait_minutes": zod.int().gt(setStatusBodyWaitMinutesExclusiveMin).nullable()
+})
+
+export const SetStatusResponse = zod.void()
+
+
+export const KeepTodayAsUsualResponse = zod.void()
+
+
+export const ChangeTodayBody = zod.object({
+  "closes_at": zod.iso.time({}).nullable(),
+  "lunch_ends_at": zod.iso.time({}).nullable(),
+  "lunch_starts_at": zod.iso.time({}).nullable(),
+  "opens_at": zod.iso.time({}).nullable()
+})
+
+export const ChangeTodayResponse = zod.void()
 
 
 export const SaveWeekBody = zod.record(zod.string(), zod.object({

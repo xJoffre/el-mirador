@@ -7,8 +7,11 @@ import jakarta.annotation.Nullable;
 
 import ec.elmirador.menu.domain.MenuRepository.DailyDish;
 import ec.elmirador.menu.domain.MenuRepository.Variant;
+import ec.elmirador.shared.Changed;
 
 public record Menu(List<Category> categories, @Nullable Map<String, String> lunchIncludes, List<DailyDish> lunch) {
+
+	public static final Changed CHANGED = new Changed("menu");
 
 	public record Category(long id, Map<String, String> name, @Nullable Map<String, String> description, String icon,
 			List<Product> products) {

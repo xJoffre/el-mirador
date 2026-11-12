@@ -70,6 +70,42 @@ class JdbcScheduleRepository implements ScheduleRepository {
 	}
 
 	@Override
+	public void addStatus(Status status, long staffId) {
+		jdbc.sql("""
+				insert into store_status_change (status, wait_minutes, reason, until_at, created_by)
+				values (:status, :waitMinutes, :reason, :untilAt, :staff)
+				""")
+			.param("status", status.status().name())
+			.param("waitMinutes", status.waitMinutes())
+			.param("reason", status.reason())
+			.param("untilAt", status.untilAt())
+			.param("staff", staffId)
+			.update();
+	}
+
+	@Override
+	public void saveOverride(LocalDate date, Hours hours, long staffId) {
+		jdbc.sql("""
+				insert into hours_override (override_date, opens_at, closes_at, lunch_starts_at, lunch_ends_at, created_by)
+				values (:date, :opensAt, :closesAt, :lunchStartsAt, :lunchEndsAt, :staff)
+				on conflict (override_date) do update set opens_at = excluded.opens_at, closes_at = excluded.closes_at,
+				  lunch_starts_at = excluded.lunch_starts_at, lunch_ends_at = excluded.lunch_ends_at, created_by = excluded.created_by
+				""")
+			.param("date", date)
+			.param("opensAt", hours.opensAt())
+			.param("closesAt", hours.closesAt())
+			.param("lunchStartsAt", hours.lunchStartsAt())
+			.param("lunchEndsAt", hours.lunchEndsAt())
+			.param("staff", staffId)
+			.update();
+	}
+
+	@Override
+	public boolean deleteOverride(LocalDate date) {
+		return jdbc.sql("delete from hours_override where override_date = :date").param("date", date).update() == 1;
+	}
+
+	@Override
 	public void saveWeek(Map<Integer, Hours> week) {
 		jdbc.sql("delete from weekly_hours").update();
 		week.forEach((weekday, hours) -> jdbc.sql("insert into weekly_hours (weekday, " + HOURS

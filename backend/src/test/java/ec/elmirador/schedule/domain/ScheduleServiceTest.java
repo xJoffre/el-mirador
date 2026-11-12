@@ -53,10 +53,26 @@ class ScheduleServiceTest {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
+		public void addStatus(Status status, long staffId) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void saveOverride(LocalDate date, Hours hours, long staffId) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean deleteOverride(LocalDate date) {
+			throw new UnsupportedOperationException();
+		}
+
 	}
 
 	private static Schedule at(LocalDateTime time, ScheduleRepository repository) {
-		return new ScheduleService(repository, Clock.fixed(time.atZone(ZONE).toInstant(), ZONE)).schedule();
+		return new ScheduleService(repository, Clock.fixed(time.atZone(ZONE).toInstant(), ZONE), event -> {
+		}).schedule();
 	}
 
 	private static InMemorySchedule everyDay(Map<LocalDate, Hours> overrides, Status status) {

@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Component
@@ -21,10 +22,11 @@ public class EventStream {
 		return emitter;
 	}
 
-	public void publish(String name, Object data) {
+	@TransactionalEventListener(fallbackExecution = true)
+	void forward(Changed change) {
 		for (var emitter : subscribers) {
 			try {
-				emitter.send(SseEmitter.event().name(name).data(data));
+				emitter.send(SseEmitter.event().name(change.topic()).data(change.topic()));
 			}
 			catch (IOException disconnected) {
 				subscribers.remove(emitter);

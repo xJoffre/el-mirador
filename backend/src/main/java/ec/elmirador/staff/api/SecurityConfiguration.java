@@ -39,7 +39,8 @@ class SecurityConfiguration {
 				.requestMatchers(GET, "/api/menu", "/api/schedule", "/api/events", "/api/staff/members").permitAll()
 				.requestMatchers(POST, "/api/staff/session").permitAll()
 				.requestMatchers("/api/staff/session").authenticated()
-				.requestMatchers(PUT, "/api/menu/products/*/sold-out", "/api/menu/option-items/*/sold-out").hasAnyRole(everyone)
+				.requestMatchers(PUT, "/api/menu/products/*/sold-out", "/api/menu/option-items/*/sold-out", "/api/menu/lunch/*/dishes/*/sold-out")
+				.hasAnyRole(everyone)
 				.requestMatchers("/api/**").hasRole(StaffRole.admin.name())
 				.anyRequest().permitAll())
 			.exceptionHandling(errors -> errors

@@ -161,8 +161,8 @@ insert into lunch_dish (id, kind, name) values
   (8, 'main', pg_temp.es('Guatita')),
   (9, 'main', pg_temp.es('Arroz con menestra y carne asada'));
 
-insert into daily_menu (menu_date, includes)
-values ((now() at time zone 'America/Guayaquil')::date, pg_temp.es('Jugo de naranjilla y gelatina'));
+insert into daily_menu (menu_date, includes, created_by)
+values ((now() at time zone 'America/Guayaquil')::date, pg_temp.es('Jugo de naranjilla y gelatina'), 1);
 
 insert into daily_menu_dish (menu_date, lunch_dish_id, price_full, price_alone)
 select menu_date, dish_id, price_full, price_alone
