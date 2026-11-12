@@ -24,7 +24,7 @@ class JdbcMenuRepository implements MenuRepository {
 	}
 
 	@Override
-	public List<Category> categories() {
+	public List<CatalogCategory> categories() {
 		var tree = jdbc.sql("""
 				select coalesce(json_agg(c order by c.sort_order, c.id), '[]')
 				from (
@@ -54,7 +54,7 @@ class JdbcMenuRepository implements MenuRepository {
 				  from menu_category mc
 				) c
 				""").query(String.class).single();
-		return json.readValue(tree, new TypeReference<List<Category>>() {
+		return json.readValue(tree, new TypeReference<List<CatalogCategory>>() {
 		});
 	}
 

@@ -4,6 +4,70 @@
  * El Mirador
  * OpenAPI spec version: 1
  */
+export type CatalogCategoryName = {[key: string]: string};
+
+export type CatalogOptionItemName = {[key: string]: string};
+
+export interface CatalogOptionItem {
+  hidden: boolean;
+  id: number;
+  name: CatalogOptionItemName;
+  /** @nullable */
+  sold_out_on: string | null;
+}
+
+export type CatalogOptionGroupName = {[key: string]: string};
+
+export interface CatalogOptionGroup {
+  id: number;
+  items: CatalogOptionItem[];
+  max_choices: number;
+  min_choices: number;
+  name: CatalogOptionGroupName;
+}
+
+/**
+ * @nullable
+ */
+export type VariantName = {[key: string]: string} | null;
+
+export interface Variant {
+  currency: string;
+  id: number;
+  /** @nullable */
+  name: VariantName;
+  price: number;
+}
+
+/**
+ * @nullable
+ */
+export type CatalogProductDescription = {[key: string]: string} | null;
+
+export type CatalogProductName = {[key: string]: string};
+
+export interface CatalogProduct {
+  /** @nullable */
+  description: CatalogProductDescription;
+  dine_in_only: boolean;
+  hidden: boolean;
+  id: number;
+  name: CatalogProductName;
+  option_groups: CatalogOptionGroup[];
+  /** @nullable */
+  photo: string | null;
+  /** @nullable */
+  sold_out_on: string | null;
+  variants: Variant[];
+}
+
+export interface CatalogCategory {
+  icon: string;
+  id: number;
+  name: CatalogCategoryName;
+  products: CatalogProduct[];
+}
+
 export type CategoryName = {[key: string]: string};
 
 export type OptionItemName = {[key: string]: string};
@@ -22,19 +86,6 @@ export interface OptionGroup {
   max_choices: number;
   min_choices: number;
   name: OptionGroupName;
-}
-
-/**
- * @nullable
- */
-export type VariantName = {[key: string]: string} | null;
-
-export interface Variant {
-  currency: string;
-  id: number;
-  /** @nullable */
-  name: VariantName;
-  price: number;
 }
 
 /**
@@ -62,6 +113,14 @@ export interface Category {
   id: number;
   name: CategoryName;
   products: Product[];
+}
+
+export type CategoryFormName = {[key: string]: string};
+
+export interface CategoryForm {
+  /** @minLength 1 */
+  icon: string;
+  name: CategoryFormName;
 }
 
 export type DailyDishKind = typeof DailyDishKind[keyof typeof DailyDishKind];
@@ -96,6 +155,11 @@ export interface Hours {
   opens_at: string | null;
 }
 
+export interface Member {
+  id: number;
+  name: string;
+}
+
 /**
  * @nullable
  */
@@ -108,6 +172,87 @@ export interface Menu {
   lunch_includes: MenuLunchIncludes;
 }
 
+export type NewUserRole = typeof NewUserRole[keyof typeof NewUserRole];
+
+
+export const NewUserRole = {
+  admin: 'admin',
+  floor: 'floor',
+  kitchen: 'kitchen',
+} as const;
+
+export interface NewUser {
+  /** @minLength 1 */
+  name: string;
+  /** @pattern [0-9]{6} */
+  pin: string;
+  role: NewUserRole;
+}
+
+export type OptionGroupFormName = {[key: string]: string};
+
+export type OptionItemFormName = {[key: string]: string};
+
+export interface OptionItemForm {
+  hidden: boolean;
+  /** @nullable */
+  id: number | null;
+  name: OptionItemFormName;
+}
+
+export interface OptionGroupForm {
+  /** @nullable */
+  id: number | null;
+  /** @minItems 1 */
+  items: OptionItemForm[];
+  /** @minimum 1 */
+  max_choices: number;
+  /** @minimum 0 */
+  min_choices: number;
+  name: OptionGroupFormName;
+}
+
+export interface Photo {
+  photo: string;
+}
+
+/**
+ * @nullable
+ */
+export type ProductFormDescription = {[key: string]: string} | null;
+
+export type ProductFormName = {[key: string]: string};
+
+/**
+ * @nullable
+ */
+export type VariantFormName = {[key: string]: string} | null;
+
+export interface VariantForm {
+  /** @nullable */
+  id: number | null;
+  /** @nullable */
+  name: VariantFormName;
+  /** @minimum 0 */
+  price: number;
+}
+
+export interface ProductForm {
+  category_id: number;
+  /** @nullable */
+  description: ProductFormDescription;
+  dine_in_only: boolean;
+  hidden: boolean;
+  name: ProductFormName;
+  option_groups: OptionGroupForm[];
+  /** @minItems 1 */
+  variants: VariantForm[];
+}
+
+export interface Saved {
+  id: number;
+}
+
 export type ScheduleWeek = {[key: string]: Hours};
 
 export interface StoreProfile {
@@ -117,8 +262,12 @@ export interface StoreProfile {
   bank_account: string | null;
   /** @nullable */
   delivery_note: string | null;
+  /** @minLength 1 */
   name: string;
-  /** @nullable */
+  /**
+     * @nullable
+     * @pattern [0-9]{8,15}
+     */
   whatsapp: string | null;
 }
 
@@ -148,6 +297,76 @@ export interface Schedule {
   today: Hours;
   week: ScheduleWeek;
 }
+
+export type SessionRole = typeof SessionRole[keyof typeof SessionRole];
+
+
+export const SessionRole = {
+  admin: 'admin',
+  floor: 'floor',
+  kitchen: 'kitchen',
+} as const;
+
+export interface Session {
+  id: number;
+  name: string;
+  role: SessionRole;
+}
+
+export interface SignIn {
+  /** @pattern [0-9]{6} */
+  pin: string;
+  staff_id: number;
+}
+
+export interface SoldOut {
+  sold_out: boolean;
+}
+
+export type UserRole = typeof UserRole[keyof typeof UserRole];
+
+
+export const UserRole = {
+  admin: 'admin',
+  floor: 'floor',
+  kitchen: 'kitchen',
+} as const;
+
+export interface User {
+  active: boolean;
+  id: number;
+  /** @nullable */
+  locked_until: string | null;
+  name: string;
+  role: UserRole;
+}
+
+export type UserChangeRole = typeof UserChangeRole[keyof typeof UserChangeRole];
+
+
+export const UserChangeRole = {
+  admin: 'admin',
+  floor: 'floor',
+  kitchen: 'kitchen',
+} as const;
+
+export interface UserChange {
+  active: boolean;
+  /** @minLength 1 */
+  name: string;
+  /**
+     * @nullable
+     * @pattern [0-9]{6}
+     */
+  pin: string | null;
+  role: UserChangeRole;
+}
+
+export type ReplacePhotoBody = {
+  file: Blob | File;
+};
+
+export type SaveWeekBody = {[key: string]: Hours};
 
 export type getMenuResponse200 = {
   data: Menu
@@ -189,6 +408,542 @@ export const getMenu = async ( options?: RequestInit): Promise<getMenuResponse> 
 
 
 
+export type getCatalogResponse200 = {
+  data: CatalogCategory[]
+  status: 200
+}
+
+export type getCatalogResponseSuccess = (getCatalogResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getCatalogResponse = (getCatalogResponseSuccess)
+
+export const getGetCatalogUrl = () => {
+
+
+
+
+  return `/api/menu/catalog`
+}
+
+export const getCatalog = async ( options?: RequestInit): Promise<getCatalogResponse> => {
+
+  const res = await fetch(getGetCatalogUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCatalogResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getCatalogResponse
+}
+
+
+
+export type createCategoryResponse200 = {
+  data: Saved
+  status: 200
+}
+
+export type createCategoryResponseSuccess = (createCategoryResponse200) & {
+  headers: Headers;
+};
+;
+
+export type createCategoryResponse = (createCategoryResponseSuccess)
+
+export const getCreateCategoryUrl = () => {
+
+
+
+
+  return `/api/menu/categories`
+}
+
+export const createCategory = async (categoryForm: CategoryForm, options?: RequestInit): Promise<createCategoryResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+const res = await fetch(getCreateCategoryUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(categoryForm)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createCategoryResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as createCategoryResponse
+}
+
+
+
+export type deleteCategoryResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteCategoryResponseSuccess = (deleteCategoryResponse204) & {
+  headers: Headers;
+};
+;
+
+export type deleteCategoryResponse = (deleteCategoryResponseSuccess)
+
+export const getDeleteCategoryUrl = (id: number,) => {
+
+
+
+
+  return `/api/menu/categories/${id}`
+}
+
+export const deleteCategory = async (id: number, options?: RequestInit): Promise<deleteCategoryResponse> => {
+
+  const res = await fetch(getDeleteCategoryUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteCategoryResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as deleteCategoryResponse
+}
+
+
+
+export type updateCategoryResponse204 = {
+  data: void
+  status: 204
+}
+
+export type updateCategoryResponseSuccess = (updateCategoryResponse204) & {
+  headers: Headers;
+};
+;
+
+export type updateCategoryResponse = (updateCategoryResponseSuccess)
+
+export const getUpdateCategoryUrl = (id: number,) => {
+
+
+
+
+  return `/api/menu/categories/${id}`
+}
+
+export const updateCategory = async (id: number,
+    categoryForm: CategoryForm, options?: RequestInit): Promise<updateCategoryResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+const res = await fetch(getUpdateCategoryUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(categoryForm)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateCategoryResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as updateCategoryResponse
+}
+
+
+
+export type markOptionItemSoldOutResponse204 = {
+  data: void
+  status: 204
+}
+
+export type markOptionItemSoldOutResponseSuccess = (markOptionItemSoldOutResponse204) & {
+  headers: Headers;
+};
+;
+
+export type markOptionItemSoldOutResponse = (markOptionItemSoldOutResponseSuccess)
+
+export const getMarkOptionItemSoldOutUrl = (id: number,) => {
+
+
+
+
+  return `/api/menu/option-items/${id}/sold-out`
+}
+
+export const markOptionItemSoldOut = async (id: number,
+    soldOut: SoldOut, options?: RequestInit): Promise<markOptionItemSoldOutResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+const res = await fetch(getMarkOptionItemSoldOutUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(soldOut)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: markOptionItemSoldOutResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as markOptionItemSoldOutResponse
+}
+
+
+
+export type createProductResponse200 = {
+  data: Saved
+  status: 200
+}
+
+export type createProductResponseSuccess = (createProductResponse200) & {
+  headers: Headers;
+};
+;
+
+export type createProductResponse = (createProductResponseSuccess)
+
+export const getCreateProductUrl = () => {
+
+
+
+
+  return `/api/menu/products`
+}
+
+export const createProduct = async (productForm: ProductForm, options?: RequestInit): Promise<createProductResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+const res = await fetch(getCreateProductUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(productForm)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createProductResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as createProductResponse
+}
+
+
+
+export type deleteProductResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteProductResponseSuccess = (deleteProductResponse204) & {
+  headers: Headers;
+};
+;
+
+export type deleteProductResponse = (deleteProductResponseSuccess)
+
+export const getDeleteProductUrl = (id: number,) => {
+
+
+
+
+  return `/api/menu/products/${id}`
+}
+
+export const deleteProduct = async (id: number, options?: RequestInit): Promise<deleteProductResponse> => {
+
+  const res = await fetch(getDeleteProductUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteProductResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as deleteProductResponse
+}
+
+
+
+export type updateProductResponse204 = {
+  data: void
+  status: 204
+}
+
+export type updateProductResponseSuccess = (updateProductResponse204) & {
+  headers: Headers;
+};
+;
+
+export type updateProductResponse = (updateProductResponseSuccess)
+
+export const getUpdateProductUrl = (id: number,) => {
+
+
+
+
+  return `/api/menu/products/${id}`
+}
+
+export const updateProduct = async (id: number,
+    productForm: ProductForm, options?: RequestInit): Promise<updateProductResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+const res = await fetch(getUpdateProductUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(productForm)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateProductResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as updateProductResponse
+}
+
+
+
+export type removePhotoResponse204 = {
+  data: void
+  status: 204
+}
+
+export type removePhotoResponseSuccess = (removePhotoResponse204) & {
+  headers: Headers;
+};
+;
+
+export type removePhotoResponse = (removePhotoResponseSuccess)
+
+export const getRemovePhotoUrl = (id: number,) => {
+
+
+
+
+  return `/api/menu/products/${id}/photo`
+}
+
+export const removePhoto = async (id: number, options?: RequestInit): Promise<removePhotoResponse> => {
+
+  const res = await fetch(getRemovePhotoUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: removePhotoResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as removePhotoResponse
+}
+
+
+
+export type replacePhotoResponse200 = {
+  data: Photo
+  status: 200
+}
+
+export type replacePhotoResponseSuccess = (replacePhotoResponse200) & {
+  headers: Headers;
+};
+;
+
+export type replacePhotoResponse = (replacePhotoResponseSuccess)
+
+export const getReplacePhotoUrl = (id: number,) => {
+
+
+
+
+  return `/api/menu/products/${id}/photo`
+}
+
+export const replacePhoto = async (id: number,
+    replacePhotoBody?: ReplacePhotoBody, options?: RequestInit): Promise<replacePhotoResponse> => {
+    const formData = replacePhotoBody === undefined ? undefined : (() => {
+const formData = new FormData();
+if(replacePhotoBody?.file !== undefined) {
+ formData.append(`file`, replacePhotoBody.file);
+ }
+return formData;
+})();
+
+  const res = await fetch(getReplacePhotoUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+    ,
+    body: formData
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: replacePhotoResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as replacePhotoResponse
+}
+
+
+
+export type markProductSoldOutResponse204 = {
+  data: void
+  status: 204
+}
+
+export type markProductSoldOutResponseSuccess = (markProductSoldOutResponse204) & {
+  headers: Headers;
+};
+;
+
+export type markProductSoldOutResponse = (markProductSoldOutResponseSuccess)
+
+export const getMarkProductSoldOutUrl = (id: number,) => {
+
+
+
+
+  return `/api/menu/products/${id}/sold-out`
+}
+
+export const markProductSoldOut = async (id: number,
+    soldOut: SoldOut, options?: RequestInit): Promise<markProductSoldOutResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+const res = await fetch(getMarkProductSoldOutUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(soldOut)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: markProductSoldOutResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as markProductSoldOutResponse
+}
+
+
+
 export type getScheduleResponse200 = {
   data: Schedule
   status: 200
@@ -225,4 +980,435 @@ export const getSchedule = async ( options?: RequestInit): Promise<getScheduleRe
 
   const data: getScheduleResponse['data'] = body ? JSON.parse(body) : {}
   return { data, status: res.status, headers: res.headers } as getScheduleResponse
+}
+
+
+
+export type saveProfileResponse204 = {
+  data: void
+  status: 204
+}
+
+export type saveProfileResponseSuccess = (saveProfileResponse204) & {
+  headers: Headers;
+};
+;
+
+export type saveProfileResponse = (saveProfileResponseSuccess)
+
+export const getSaveProfileUrl = () => {
+
+
+
+
+  return `/api/schedule/profile`
+}
+
+export const saveProfile = async (storeProfile: StoreProfile, options?: RequestInit): Promise<saveProfileResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+const res = await fetch(getSaveProfileUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(storeProfile)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: saveProfileResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as saveProfileResponse
+}
+
+
+
+export type saveWeekResponse204 = {
+  data: void
+  status: 204
+}
+
+export type saveWeekResponseSuccess = (saveWeekResponse204) & {
+  headers: Headers;
+};
+;
+
+export type saveWeekResponse = (saveWeekResponseSuccess)
+
+export const getSaveWeekUrl = () => {
+
+
+
+
+  return `/api/schedule/week`
+}
+
+export const saveWeek = async (saveWeekBody: SaveWeekBody, options?: RequestInit): Promise<saveWeekResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+const res = await fetch(getSaveWeekUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(saveWeekBody)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: saveWeekResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as saveWeekResponse
+}
+
+
+
+export type getMembersResponse200 = {
+  data: Member[]
+  status: 200
+}
+
+export type getMembersResponseSuccess = (getMembersResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getMembersResponse = (getMembersResponseSuccess)
+
+export const getGetMembersUrl = () => {
+
+
+
+
+  return `/api/staff/members`
+}
+
+export const getMembers = async ( options?: RequestInit): Promise<getMembersResponse> => {
+
+  const res = await fetch(getGetMembersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getMembersResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getMembersResponse
+}
+
+
+
+export type signOutResponse204 = {
+  data: void
+  status: 204
+}
+
+export type signOutResponseSuccess = (signOutResponse204) & {
+  headers: Headers;
+};
+;
+
+export type signOutResponse = (signOutResponseSuccess)
+
+export const getSignOutUrl = () => {
+
+
+
+
+  return `/api/staff/session`
+}
+
+export const signOut = async ( options?: RequestInit): Promise<signOutResponse> => {
+
+  const res = await fetch(getSignOutUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: signOutResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as signOutResponse
+}
+
+
+
+export type getSessionResponse200 = {
+  data: Session
+  status: 200
+}
+
+export type getSessionResponseSuccess = (getSessionResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getSessionResponse = (getSessionResponseSuccess)
+
+export const getGetSessionUrl = () => {
+
+
+
+
+  return `/api/staff/session`
+}
+
+export const getSession = async ( options?: RequestInit): Promise<getSessionResponse> => {
+
+  const res = await fetch(getGetSessionUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getSessionResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getSessionResponse
+}
+
+
+
+export type signInResponse200 = {
+  data: Session
+  status: 200
+}
+
+export type signInResponseSuccess = (signInResponse200) & {
+  headers: Headers;
+};
+;
+
+export type signInResponse = (signInResponseSuccess)
+
+export const getSignInUrl = () => {
+
+
+
+
+  return `/api/staff/session`
+}
+
+export const signIn = async (signInBody: SignIn, options?: RequestInit): Promise<signInResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+const res = await fetch(getSignInUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(signInBody)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: signInResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as signInResponse
+}
+
+
+
+export type getUsersResponse200 = {
+  data: User[]
+  status: 200
+}
+
+export type getUsersResponseSuccess = (getUsersResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getUsersResponse = (getUsersResponseSuccess)
+
+export const getGetUsersUrl = () => {
+
+
+
+
+  return `/api/staff/users`
+}
+
+export const getUsers = async ( options?: RequestInit): Promise<getUsersResponse> => {
+
+  const res = await fetch(getGetUsersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getUsersResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getUsersResponse
+}
+
+
+
+export type createUserResponse200 = {
+  data: Saved
+  status: 200
+}
+
+export type createUserResponseSuccess = (createUserResponse200) & {
+  headers: Headers;
+};
+;
+
+export type createUserResponse = (createUserResponseSuccess)
+
+export const getCreateUserUrl = () => {
+
+
+
+
+  return `/api/staff/users`
+}
+
+export const createUser = async (newUser: NewUser, options?: RequestInit): Promise<createUserResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+const res = await fetch(getCreateUserUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(newUser)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createUserResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as createUserResponse
+}
+
+
+
+export type updateUserResponse204 = {
+  data: void
+  status: 204
+}
+
+export type updateUserResponseSuccess = (updateUserResponse204) & {
+  headers: Headers;
+};
+;
+
+export type updateUserResponse = (updateUserResponseSuccess)
+
+export const getUpdateUserUrl = (id: number,) => {
+
+
+
+
+  return `/api/staff/users/${id}`
+}
+
+export const updateUser = async (id: number,
+    userChange: UserChange, options?: RequestInit): Promise<updateUserResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+const res = await fetch(getUpdateUserUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(userChange)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateUserResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as updateUserResponse
 }

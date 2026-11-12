@@ -26,6 +26,300 @@
         "tags" : [ "menu-controller" ]
       }
     },
+    "/api/menu/catalog" : {
+      "get" : {
+        "operationId" : "getCatalog",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CatalogCategory"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "catalog-controller" ]
+      }
+    },
+    "/api/menu/categories" : {
+      "post" : {
+        "operationId" : "createCategory",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CategoryForm"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Saved"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "catalog-controller" ]
+      }
+    },
+    "/api/menu/categories/{id}" : {
+      "delete" : {
+        "operationId" : "deleteCategory",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "catalog-controller" ]
+      },
+      "put" : {
+        "operationId" : "updateCategory",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CategoryForm"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "catalog-controller" ]
+      }
+    },
+    "/api/menu/option-items/{id}/sold-out" : {
+      "put" : {
+        "operationId" : "markOptionItemSoldOut",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SoldOut"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "catalog-controller" ]
+      }
+    },
+    "/api/menu/products" : {
+      "post" : {
+        "operationId" : "createProduct",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProductForm"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Saved"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "catalog-controller" ]
+      }
+    },
+    "/api/menu/products/{id}" : {
+      "delete" : {
+        "operationId" : "deleteProduct",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "catalog-controller" ]
+      },
+      "put" : {
+        "operationId" : "updateProduct",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProductForm"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "catalog-controller" ]
+      }
+    },
+    "/api/menu/products/{id}/photo" : {
+      "delete" : {
+        "operationId" : "removePhoto",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "catalog-controller" ]
+      },
+      "put" : {
+        "operationId" : "replacePhoto",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "file" : {
+                    "type" : "string",
+                    "format" : "binary"
+                  }
+                },
+                "required" : [ "file" ]
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Photo"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "catalog-controller" ]
+      }
+    },
+    "/api/menu/products/{id}/sold-out" : {
+      "put" : {
+        "operationId" : "markProductSoldOut",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SoldOut"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "catalog-controller" ]
+      }
+    },
     "/api/schedule" : {
       "get" : {
         "operationId" : "getSchedule",
@@ -43,10 +337,331 @@
         },
         "tags" : [ "schedule-controller" ]
       }
+    },
+    "/api/schedule/profile" : {
+      "put" : {
+        "operationId" : "saveProfile",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/StoreProfile"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "schedule-controller" ]
+      }
+    },
+    "/api/schedule/week" : {
+      "put" : {
+        "operationId" : "saveWeek",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "additionalProperties" : {
+                  "$ref" : "#/components/schemas/Hours"
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "schedule-controller" ]
+      }
+    },
+    "/api/staff/members" : {
+      "get" : {
+        "operationId" : "getMembers",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Member"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "staff-controller" ]
+      }
+    },
+    "/api/staff/session" : {
+      "delete" : {
+        "operationId" : "signOut",
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "staff-controller" ]
+      },
+      "get" : {
+        "operationId" : "getSession",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Session"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "staff-controller" ]
+      },
+      "post" : {
+        "operationId" : "signIn",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SignIn"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Session"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "staff-controller" ]
+      }
+    },
+    "/api/staff/users" : {
+      "get" : {
+        "operationId" : "getUsers",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/User"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "staff-controller" ]
+      },
+      "post" : {
+        "operationId" : "createUser",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/NewUser"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Saved"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "staff-controller" ]
+      }
+    },
+    "/api/staff/users/{id}" : {
+      "put" : {
+        "operationId" : "updateUser",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UserChange"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "staff-controller" ]
+      }
     }
   },
   "components" : {
     "schemas" : {
+      "CatalogCategory" : {
+        "type" : "object",
+        "properties" : {
+          "icon" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "products" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CatalogProduct"
+            }
+          }
+        },
+        "required" : [ "icon", "id", "name", "products" ]
+      },
+      "CatalogOptionGroup" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CatalogOptionItem"
+            }
+          },
+          "max_choices" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "min_choices" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "name" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          }
+        },
+        "required" : [ "id", "items", "max_choices", "min_choices", "name" ]
+      },
+      "CatalogOptionItem" : {
+        "type" : "object",
+        "properties" : {
+          "hidden" : {
+            "type" : "boolean"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "sold_out_on" : {
+            "type" : [ "string", "null" ],
+            "format" : "date"
+          }
+        },
+        "required" : [ "hidden", "id", "name", "sold_out_on" ]
+      },
+      "CatalogProduct" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "dine_in_only" : {
+            "type" : "boolean"
+          },
+          "hidden" : {
+            "type" : "boolean"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "option_groups" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CatalogOptionGroup"
+            }
+          },
+          "photo" : {
+            "type" : [ "string", "null" ]
+          },
+          "sold_out_on" : {
+            "type" : [ "string", "null" ],
+            "format" : "date"
+          },
+          "variants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Variant"
+            }
+          }
+        },
+        "required" : [ "description", "dine_in_only", "hidden", "id", "name", "option_groups", "photo", "sold_out_on", "variants" ]
+      },
       "Category" : {
         "type" : "object",
         "properties" : {
@@ -71,6 +686,23 @@
           }
         },
         "required" : [ "icon", "id", "name", "products" ]
+      },
+      "CategoryForm" : {
+        "type" : "object",
+        "properties" : {
+          "icon" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "name" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            },
+            "minProperties" : 1
+          }
+        },
+        "required" : [ "icon", "name" ]
       },
       "DailyDish" : {
         "type" : "object",
@@ -126,6 +758,19 @@
         },
         "required" : [ "closes_at", "lunch_ends_at", "lunch_starts_at", "opens_at" ]
       },
+      "Member" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "id", "name" ]
+      },
       "Menu" : {
         "type" : "object",
         "properties" : {
@@ -149,6 +794,24 @@
           }
         },
         "required" : [ "categories", "lunch", "lunch_includes" ]
+      },
+      "NewUser" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "pin" : {
+            "type" : "string",
+            "pattern" : "[0-9]{6}"
+          },
+          "role" : {
+            "type" : "string",
+            "enum" : [ "admin", "floor", "kitchen" ]
+          }
+        },
+        "required" : [ "name", "pin", "role" ]
       },
       "OptionGroup" : {
         "type" : "object",
@@ -180,6 +843,40 @@
         },
         "required" : [ "id", "items", "max_choices", "min_choices", "name" ]
       },
+      "OptionGroupForm" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/OptionItemForm"
+            },
+            "minItems" : 1
+          },
+          "max_choices" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 1
+          },
+          "min_choices" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 0
+          },
+          "name" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            },
+            "minProperties" : 1
+          }
+        },
+        "required" : [ "id", "items", "max_choices", "min_choices", "name" ]
+      },
       "OptionItem" : {
         "type" : "object",
         "properties" : {
@@ -198,6 +895,35 @@
           }
         },
         "required" : [ "id", "name", "sold_out" ]
+      },
+      "OptionItemForm" : {
+        "type" : "object",
+        "properties" : {
+          "hidden" : {
+            "type" : "boolean"
+          },
+          "id" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            },
+            "minProperties" : 1
+          }
+        },
+        "required" : [ "hidden", "id", "name" ]
+      },
+      "Photo" : {
+        "type" : "object",
+        "properties" : {
+          "photo" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "photo" ]
       },
       "Product" : {
         "type" : "object",
@@ -242,6 +968,58 @@
         },
         "required" : [ "description", "dine_in_only", "id", "name", "option_groups", "photo", "sold_out", "variants" ]
       },
+      "ProductForm" : {
+        "type" : "object",
+        "properties" : {
+          "category_id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "description" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "dine_in_only" : {
+            "type" : "boolean"
+          },
+          "hidden" : {
+            "type" : "boolean"
+          },
+          "name" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            },
+            "minProperties" : 1
+          },
+          "option_groups" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/OptionGroupForm"
+            }
+          },
+          "variants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/VariantForm"
+            },
+            "minItems" : 1
+          }
+        },
+        "required" : [ "category_id", "description", "dine_in_only", "hidden", "name", "option_groups", "variants" ]
+      },
+      "Saved" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        },
+        "required" : [ "id" ]
+      },
       "Schedule" : {
         "type" : "object",
         "properties" : {
@@ -265,6 +1043,46 @@
           }
         },
         "required" : [ "lunch_now", "profile", "status", "today", "week" ]
+      },
+      "Session" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "role" : {
+            "type" : "string",
+            "enum" : [ "admin", "floor", "kitchen" ]
+          }
+        },
+        "required" : [ "id", "name", "role" ]
+      },
+      "SignIn" : {
+        "type" : "object",
+        "properties" : {
+          "pin" : {
+            "type" : "string",
+            "pattern" : "[0-9]{6}"
+          },
+          "staff_id" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        },
+        "required" : [ "pin", "staff_id" ]
+      },
+      "SoldOut" : {
+        "type" : "object",
+        "properties" : {
+          "sold_out" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "sold_out" ]
       },
       "Status" : {
         "type" : "object",
@@ -300,13 +1118,60 @@
             "type" : [ "string", "null" ]
           },
           "name" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "whatsapp" : {
-            "type" : [ "string", "null" ]
+            "type" : [ "string", "null" ],
+            "pattern" : "[0-9]{8,15}"
           }
         },
         "required" : [ "address", "bank_account", "delivery_note", "name", "whatsapp" ]
+      },
+      "User" : {
+        "type" : "object",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "locked_until" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "role" : {
+            "type" : "string",
+            "enum" : [ "admin", "floor", "kitchen" ]
+          }
+        },
+        "required" : [ "active", "id", "locked_until", "name", "role" ]
+      },
+      "UserChange" : {
+        "type" : "object",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "name" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "pin" : {
+            "type" : [ "string", "null" ],
+            "pattern" : "[0-9]{6}"
+          },
+          "role" : {
+            "type" : "string",
+            "enum" : [ "admin", "floor", "kitchen" ]
+          }
+        },
+        "required" : [ "active", "name", "pin", "role" ]
       },
       "Variant" : {
         "type" : "object",
@@ -329,6 +1194,26 @@
           }
         },
         "required" : [ "currency", "id", "name", "price" ]
+      },
+      "VariantForm" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "price" : {
+            "type" : "number",
+            "minimum" : 0
+          }
+        },
+        "required" : [ "id", "name", "price" ]
       }
     }
   }

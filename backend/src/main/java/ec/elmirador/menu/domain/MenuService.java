@@ -37,7 +37,7 @@ public class MenuService {
 				lunch.map(DailyMenu::dishes).orElse(List.of()));
 	}
 
-	private static Menu.Product product(MenuRepository.Product product, LocalDate today) {
+	private static Menu.Product product(MenuRepository.CatalogProduct product, LocalDate today) {
 		var optionGroups = product.optionGroups()
 			.stream()
 			.map(group -> new Menu.OptionGroup(group.id(), group.name(), group.minChoices(), group.maxChoices(),

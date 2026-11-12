@@ -1,0 +1,111 @@
+package ec.elmirador.staff.api;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import ec.elmirador.menu.domain.CatalogService;
+import ec.elmirador.menu.domain.MenuService;
+import ec.elmirador.schedule.domain.ScheduleService;
+import ec.elmirador.shared.AppProperties;
+import ec.elmirador.shared.EventStream;
+import ec.elmirador.staff.domain.Session;
+import ec.elmirador.staff.domain.StaffRole;
+import ec.elmirador.staff.domain.StaffService;
+
+@WebMvcTest
+@Import(SecurityConfiguration.class)
+@EnableConfigurationProperties(AppProperties.class)
+class PermissionsTest {
+
+	private static final String ANONYMOUS = "anonymous";
+
+	@Autowired
+	private MockMvc http;
+
+	@MockitoBean
+	private StaffService staff;
+
+	@MockitoBean
+	private MenuService menu;
+
+	@MockitoBean
+	private CatalogService catalog;
+
+	@MockitoBean
+	private ScheduleService schedule;
+
+	@MockitoBean
+	private EventStream events;
+
+	static Stream<Arguments> routes() {
+		var everyone = List.of(ANONYMOUS, "admin", "floor", "kitchen");
+		var staff = List.of("admin", "floor", "kitchen");
+		var admin = List.of("admin");
+		return Stream.of(
+				Arguments.of(HttpMethod.GET, "/api/menu", everyone),
+				Arguments.of(HttpMethod.GET, "/api/schedule", everyone),
+				Arguments.of(HttpMethod.GET, "/api/staff/members", everyone),
+				Arguments.of(HttpMethod.POST, "/api/staff/session", everyone),
+				Arguments.of(HttpMethod.GET, "/api/staff/session", staff),
+				Arguments.of(HttpMethod.DELETE, "/api/staff/session", staff),
+				Arguments.of(HttpMethod.PUT, "/api/menu/products/1/sold-out", staff),
+				Arguments.of(HttpMethod.PUT, "/api/menu/option-items/1/sold-out", staff),
+				Arguments.of(HttpMethod.GET, "/api/menu/catalog", admin),
+				Arguments.of(HttpMethod.POST, "/api/menu/categories", admin),
+				Arguments.of(HttpMethod.PUT, "/api/menu/categories/1", admin),
+				Arguments.of(HttpMethod.DELETE, "/api/menu/categories/1", admin),
+				Arguments.of(HttpMethod.POST, "/api/menu/products", admin),
+				Arguments.of(HttpMethod.PUT, "/api/menu/products/1", admin),
+				Arguments.of(HttpMethod.DELETE, "/api/menu/products/1", admin),
+				Arguments.of(HttpMethod.PUT, "/api/menu/products/1/photo", admin),
+				Arguments.of(HttpMethod.DELETE, "/api/menu/products/1/photo", admin),
+				Arguments.of(HttpMethod.PUT, "/api/schedule/profile", admin),
+				Arguments.of(HttpMethod.PUT, "/api/schedule/week", admin),
+				Arguments.of(HttpMethod.GET, "/api/staff/users", admin),
+				Arguments.of(HttpMethod.POST, "/api/staff/users", admin),
+				Arguments.of(HttpMethod.PUT, "/api/staff/users/2", admin),
+				Arguments.of(HttpMethod.GET, "/api/anything-new", admin));
+	}
+
+	@ParameterizedTest(name = "{0} {1}")
+	@MethodSource("routes")
+	void everyRouteLetsInOnlyItsRoles(HttpMethod method, String path, List<String> allowed) throws Exception {
+		given(staff.signIn(any())).willReturn(new Session(1, "Rosa", StaffRole.admin));
+		for (var role : Stream.concat(Stream.of(ANONYMOUS), Arrays.stream(StaffRole.values()).map(Enum::name)).toList()) {
+			var call = request(method, path).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("{}");
+			if (!role.equals(ANONYMOUS)) {
+				call.with(user("someone").roles(role));
+			}
+			var status = http.perform(call).andReturn().getResponse().getStatus();
+
+			var refused = role.equals(ANONYMOUS) ? 401 : 403;
+			if (allowed.contains(role)) {
+				assertThat(status).as("%s as %s", path, role).isNotIn(401, 403);
+			}
+			else {
+				assertThat(status).as("%s as %s", path, role).isEqualTo(refused);
+			}
+		}
+	}
+
+}

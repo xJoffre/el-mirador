@@ -1,0 +1,29 @@
+package ec.elmirador.shared;
+
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+class ApiErrors {
+
+	@ExceptionHandler(DuplicateKeyException.class)
+	ProblemDetail duplicate() {
+		return problem("shared.duplicate");
+	}
+
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	ProblemDetail rejected() {
+		return problem("shared.rejected");
+	}
+
+	private static ProblemDetail problem(String code) {
+		var problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+		problem.setProperty("code", code);
+		return problem;
+	}
+
+}

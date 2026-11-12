@@ -2,11 +2,14 @@ package ec.elmirador.schedule.domain;
 
 import java.time.Clock;
 import java.time.OffsetDateTime;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ec.elmirador.schedule.domain.ScheduleRepository.Hours;
 import ec.elmirador.schedule.domain.ScheduleRepository.Status;
+import ec.elmirador.schedule.domain.ScheduleRepository.StoreProfile;
 
 @Service
 public class ScheduleService {
@@ -32,6 +35,15 @@ public class ScheduleService {
 					.orElse(new Status(StoreStatus.open, null, null, null))
 				: new Status(StoreStatus.closed, null, null, null);
 		return new Schedule(repository.profile(), week, today, status, today.lunch(time));
+	}
+
+	public void saveProfile(StoreProfile profile) {
+		repository.saveProfile(profile);
+	}
+
+	@Transactional
+	public void saveWeek(Map<Integer, Hours> week) {
+		repository.saveWeek(week);
 	}
 
 }

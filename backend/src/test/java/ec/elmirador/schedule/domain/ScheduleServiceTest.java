@@ -43,6 +43,16 @@ class ScheduleServiceTest {
 			return new StoreProfile("El Mirador", null, null, null, null);
 		}
 
+		@Override
+		public void saveProfile(StoreProfile profile) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void saveWeek(Map<Integer, Hours> week) {
+			throw new UnsupportedOperationException();
+		}
+
 	}
 
 	private static Schedule at(LocalDateTime time, ScheduleRepository repository) {

@@ -50,14 +50,215 @@ export const GetMenuResponse = zod.object({
 })
 
 
+export const GetCatalogResponseItem = zod.object({
+  "icon": zod.string(),
+  "id": zod.int(),
+  "name": zod.record(zod.string(), zod.string()),
+  "products": zod.array(zod.object({
+  "description": zod.record(zod.string(), zod.string()).nullable(),
+  "dine_in_only": zod.boolean(),
+  "hidden": zod.boolean(),
+  "id": zod.int(),
+  "name": zod.record(zod.string(), zod.string()),
+  "option_groups": zod.array(zod.object({
+  "id": zod.int(),
+  "items": zod.array(zod.object({
+  "hidden": zod.boolean(),
+  "id": zod.int(),
+  "name": zod.record(zod.string(), zod.string()),
+  "sold_out_on": zod.iso.date().nullable()
+})),
+  "max_choices": zod.int(),
+  "min_choices": zod.int(),
+  "name": zod.record(zod.string(), zod.string())
+})),
+  "photo": zod.string().nullable(),
+  "sold_out_on": zod.iso.date().nullable(),
+  "variants": zod.array(zod.object({
+  "currency": zod.string(),
+  "id": zod.int(),
+  "name": zod.record(zod.string(), zod.string()).nullable(),
+  "price": zod.number()
+}))
+}))
+})
+export const GetCatalogResponse = zod.array(GetCatalogResponseItem)
+
+
+
+
+
+export const CreateCategoryBody = zod.object({
+  "icon": zod.string().min(1),
+  "name": zod.record(zod.string(), zod.string())
+})
+
+export const CreateCategoryResponse = zod.object({
+  "id": zod.int()
+})
+
+
+export const DeleteCategoryParams = zod.object({
+  "id": zod.int()
+})
+
+export const DeleteCategoryResponse = zod.void()
+
+
+export const UpdateCategoryParams = zod.object({
+  "id": zod.int()
+})
+
+
+
+
+export const UpdateCategoryBody = zod.object({
+  "icon": zod.string().min(1),
+  "name": zod.record(zod.string(), zod.string())
+})
+
+export const UpdateCategoryResponse = zod.void()
+
+
+export const MarkOptionItemSoldOutParams = zod.object({
+  "id": zod.int()
+})
+
+export const MarkOptionItemSoldOutBody = zod.object({
+  "sold_out": zod.boolean()
+})
+
+export const MarkOptionItemSoldOutResponse = zod.void()
+
+
+
+
+export const createProductBodyOptionGroupsItemMinChoicesMin = 0;
+
+export const createProductBodyVariantsItemPriceMin = 0;
+
+
+
+
+export const CreateProductBody = zod.object({
+  "category_id": zod.int(),
+  "description": zod.record(zod.string(), zod.string()).nullable(),
+  "dine_in_only": zod.boolean(),
+  "hidden": zod.boolean(),
+  "name": zod.record(zod.string(), zod.string()),
+  "option_groups": zod.array(zod.object({
+  "id": zod.int().nullable(),
+  "items": zod.array(zod.object({
+  "hidden": zod.boolean(),
+  "id": zod.int().nullable(),
+  "name": zod.record(zod.string(), zod.string())
+})).min(1),
+  "max_choices": zod.int().min(1),
+  "min_choices": zod.int().min(createProductBodyOptionGroupsItemMinChoicesMin),
+  "name": zod.record(zod.string(), zod.string())
+})),
+  "variants": zod.array(zod.object({
+  "id": zod.int().nullable(),
+  "name": zod.record(zod.string(), zod.string()).nullable(),
+  "price": zod.number().min(createProductBodyVariantsItemPriceMin)
+})).min(1)
+})
+
+export const CreateProductResponse = zod.object({
+  "id": zod.int()
+})
+
+
+export const DeleteProductParams = zod.object({
+  "id": zod.int()
+})
+
+export const DeleteProductResponse = zod.void()
+
+
+export const UpdateProductParams = zod.object({
+  "id": zod.int()
+})
+
+
+
+export const updateProductBodyOptionGroupsItemMinChoicesMin = 0;
+
+export const updateProductBodyVariantsItemPriceMin = 0;
+
+
+
+
+export const UpdateProductBody = zod.object({
+  "category_id": zod.int(),
+  "description": zod.record(zod.string(), zod.string()).nullable(),
+  "dine_in_only": zod.boolean(),
+  "hidden": zod.boolean(),
+  "name": zod.record(zod.string(), zod.string()),
+  "option_groups": zod.array(zod.object({
+  "id": zod.int().nullable(),
+  "items": zod.array(zod.object({
+  "hidden": zod.boolean(),
+  "id": zod.int().nullable(),
+  "name": zod.record(zod.string(), zod.string())
+})).min(1),
+  "max_choices": zod.int().min(1),
+  "min_choices": zod.int().min(updateProductBodyOptionGroupsItemMinChoicesMin),
+  "name": zod.record(zod.string(), zod.string())
+})),
+  "variants": zod.array(zod.object({
+  "id": zod.int().nullable(),
+  "name": zod.record(zod.string(), zod.string()).nullable(),
+  "price": zod.number().min(updateProductBodyVariantsItemPriceMin)
+})).min(1)
+})
+
+export const UpdateProductResponse = zod.void()
+
+
+export const RemovePhotoParams = zod.object({
+  "id": zod.int()
+})
+
+export const RemovePhotoResponse = zod.void()
+
+
+export const ReplacePhotoParams = zod.object({
+  "id": zod.int()
+})
+
+export const ReplacePhotoBody = zod.object({
+  "file": zod.instanceof(Blob)
+})
+
+export const ReplacePhotoResponse = zod.object({
+  "photo": zod.string()
+})
+
+
+export const MarkProductSoldOutParams = zod.object({
+  "id": zod.int()
+})
+
+export const MarkProductSoldOutBody = zod.object({
+  "sold_out": zod.boolean()
+})
+
+export const MarkProductSoldOutResponse = zod.void()
+
+
+
+export const getScheduleResponseProfileWhatsappRegExp = new RegExp('[0-9]{8,15}');
+
+
 export const GetScheduleResponse = zod.object({
   "lunch_now": zod.boolean(),
   "profile": zod.object({
   "address": zod.string().nullable(),
   "bank_account": zod.string().nullable(),
   "delivery_note": zod.string().nullable(),
-  "name": zod.string(),
-  "whatsapp": zod.string().nullable()
+  "name": zod.string().min(1),
+  "whatsapp": zod.string().regex(getScheduleResponseProfileWhatsappRegExp).nullable()
 }),
   "status": zod.object({
   "reason": zod.string().nullable(),
@@ -78,3 +279,103 @@ export const GetScheduleResponse = zod.object({
   "opens_at": zod.iso.time({}).nullable()
 }))
 })
+
+
+
+export const saveProfileBodyWhatsappRegExp = new RegExp('[0-9]{8,15}');
+
+
+export const SaveProfileBody = zod.object({
+  "address": zod.string().nullable(),
+  "bank_account": zod.string().nullable(),
+  "delivery_note": zod.string().nullable(),
+  "name": zod.string().min(1),
+  "whatsapp": zod.string().regex(saveProfileBodyWhatsappRegExp).nullable()
+})
+
+export const SaveProfileResponse = zod.void()
+
+
+export const SaveWeekBody = zod.record(zod.string(), zod.object({
+  "closes_at": zod.iso.time({}).nullable(),
+  "lunch_ends_at": zod.iso.time({}).nullable(),
+  "lunch_starts_at": zod.iso.time({}).nullable(),
+  "opens_at": zod.iso.time({}).nullable()
+}))
+
+export const SaveWeekResponse = zod.void()
+
+
+export const GetMembersResponseItem = zod.object({
+  "id": zod.int(),
+  "name": zod.string()
+})
+export const GetMembersResponse = zod.array(GetMembersResponseItem)
+
+
+export const SignOutResponse = zod.void()
+
+
+export const GetSessionResponse = zod.object({
+  "id": zod.int(),
+  "name": zod.string(),
+  "role": zod.enum(['admin', 'floor', 'kitchen'])
+})
+
+
+export const signInBodyPinRegExp = new RegExp('[0-9]{6}');
+
+
+export const SignInBody = zod.object({
+  "pin": zod.string().regex(signInBodyPinRegExp),
+  "staff_id": zod.int()
+})
+
+export const SignInResponse = zod.object({
+  "id": zod.int(),
+  "name": zod.string(),
+  "role": zod.enum(['admin', 'floor', 'kitchen'])
+})
+
+
+export const GetUsersResponseItem = zod.object({
+  "active": zod.boolean(),
+  "id": zod.int(),
+  "locked_until": zod.iso.datetime({"offset":true}).nullable(),
+  "name": zod.string(),
+  "role": zod.enum(['admin', 'floor', 'kitchen'])
+})
+export const GetUsersResponse = zod.array(GetUsersResponseItem)
+
+
+
+export const createUserBodyPinRegExp = new RegExp('[0-9]{6}');
+
+
+export const CreateUserBody = zod.object({
+  "name": zod.string().min(1),
+  "pin": zod.string().regex(createUserBodyPinRegExp),
+  "role": zod.enum(['admin', 'floor', 'kitchen'])
+})
+
+export const CreateUserResponse = zod.object({
+  "id": zod.int()
+})
+
+
+export const UpdateUserParams = zod.object({
+  "id": zod.int()
+})
+
+
+export const updateUserBodyPinRegExp = new RegExp('[0-9]{6}');
+
+
+export const UpdateUserBody = zod.object({
+  "active": zod.boolean(),
+  "name": zod.string().min(1),
+  "pin": zod.string().regex(updateUserBodyPinRegExp).nullable(),
+  "role": zod.enum(['admin', 'floor', 'kitchen'])
+})
+
+export const UpdateUserResponse = zod.void()

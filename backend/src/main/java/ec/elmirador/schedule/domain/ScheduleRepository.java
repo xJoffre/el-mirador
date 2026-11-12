@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 public interface ScheduleRepository {
 
@@ -17,6 +19,10 @@ public interface ScheduleRepository {
 	Optional<Status> latestStatus();
 
 	StoreProfile profile();
+
+	void saveProfile(StoreProfile profile);
+
+	void saveWeek(Map<Integer, Hours> week);
 
 	record Hours(@Nullable LocalTime opensAt, @Nullable LocalTime closesAt, @Nullable LocalTime lunchStartsAt,
 			@Nullable LocalTime lunchEndsAt) {
@@ -47,7 +53,8 @@ public interface ScheduleRepository {
 			@Nullable OffsetDateTime untilAt) {
 	}
 
-	record StoreProfile(String name, @Nullable String address, @Nullable String whatsapp, @Nullable String bankAccount,
+	record StoreProfile(@NotBlank String name, @Nullable String address,
+			@Nullable @Pattern(regexp = "[0-9]{8,15}") String whatsapp, @Nullable String bankAccount,
 			@Nullable String deliveryNote) {
 	}
 

@@ -12,12 +12,12 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
-import ec.elmirador.menu.domain.MenuRepository.Category;
+import ec.elmirador.menu.domain.MenuRepository.CatalogCategory;
 import ec.elmirador.menu.domain.MenuRepository.DailyDish;
 import ec.elmirador.menu.domain.MenuRepository.DailyMenu;
-import ec.elmirador.menu.domain.MenuRepository.OptionGroup;
-import ec.elmirador.menu.domain.MenuRepository.OptionItem;
-import ec.elmirador.menu.domain.MenuRepository.Product;
+import ec.elmirador.menu.domain.MenuRepository.CatalogOptionGroup;
+import ec.elmirador.menu.domain.MenuRepository.CatalogOptionItem;
+import ec.elmirador.menu.domain.MenuRepository.CatalogProduct;
 import ec.elmirador.menu.domain.MenuRepository.Variant;
 
 class MenuServiceTest {
@@ -26,7 +26,7 @@ class MenuServiceTest {
 
 	private static final LocalDate TODAY = LocalDate.of(2026, 11, 14);
 
-	record InMemoryMenu(List<Category> categories, Map<LocalDate, DailyMenu> lunches) implements MenuRepository {
+	record InMemoryMenu(List<CatalogCategory> categories, Map<LocalDate, DailyMenu> lunches) implements MenuRepository {
 
 		@Override
 		public Optional<DailyMenu> dailyMenu(LocalDate date) {
@@ -39,8 +39,8 @@ class MenuServiceTest {
 		return Map.of("es", text);
 	}
 
-	private static Product product(long id, boolean hidden, LocalDate soldOutOn, List<OptionGroup> groups) {
-		return new Product(id, es("p" + id), null, false, hidden, soldOutOn, null,
+	private static CatalogProduct product(long id, boolean hidden, LocalDate soldOutOn, List<CatalogOptionGroup> groups) {
+		return new CatalogProduct(id, es("p" + id), null, false, hidden, soldOutOn, null,
 				List.of(new Variant(id, null, new BigDecimal("3.00"), "USD")), groups);
 	}
 
@@ -50,9 +50,9 @@ class MenuServiceTest {
 
 	@Test
 	void soldOutTodayIsAvailableAgainTomorrow() {
-		var sauce = new OptionGroup(1, es("salsa"), 1, 1, List.of(new OptionItem(1, es("bbq"), false, TODAY)));
+		var sauce = new CatalogOptionGroup(1, es("salsa"), 1, 1, List.of(new CatalogOptionItem(1, es("bbq"), false, TODAY)));
 		var repository = new InMemoryMenu(
-				List.of(new Category(1, es("picaditas"), "drumstick", List.of(product(1, false, TODAY, List.of(sauce))))),
+				List.of(new CatalogCategory(1, es("picaditas"), "drumstick", List.of(product(1, false, TODAY, List.of(sauce))))),
 				Map.of());
 
 		var today = menuOn(TODAY, repository).categories().getFirst().products().getFirst();
@@ -66,11 +66,11 @@ class MenuServiceTest {
 
 	@Test
 	void hiddenProductsAndItemsAreLeftOutWithTheirEmptySections() {
-		var flavors = new OptionGroup(1, es("sabor"), 1, 1,
-				List.of(new OptionItem(1, es("mora"), false, null), new OptionItem(2, es("fresa"), true, null)));
+		var flavors = new CatalogOptionGroup(1, es("sabor"), 1, 1,
+				List.of(new CatalogOptionItem(1, es("mora"), false, null), new CatalogOptionItem(2, es("fresa"), true, null)));
 		var repository = new InMemoryMenu(List.of(
-				new Category(1, es("bebidas"), "cup-soda", List.of(product(1, false, null, List.of(flavors)), product(2, true, null, List.of()))),
-				new Category(2, es("mariscos"), "shrimp", List.of(product(3, true, null, List.of())))), Map.of());
+				new CatalogCategory(1, es("bebidas"), "cup-soda", List.of(product(1, false, null, List.of(flavors)), product(2, true, null, List.of()))),
+				new CatalogCategory(2, es("mariscos"), "shrimp", List.of(product(3, true, null, List.of())))), Map.of());
 
 		var categories = menuOn(TODAY, repository).categories();
 
@@ -83,10 +83,10 @@ class MenuServiceTest {
 
 	@Test
 	void aRequiredChoiceWithNothingLeftSellsOutTheProduct() {
-		var sauces = new OptionGroup(1, es("salsa"), 1, 1,
-				List.of(new OptionItem(1, es("bbq"), false, TODAY), new OptionItem(2, es("piña"), true, null)));
-		var optionalExtras = new OptionGroup(2, es("extra"), 0, 1, List.of(new OptionItem(3, es("queso"), false, TODAY)));
-		var repository = new InMemoryMenu(List.of(new Category(1, es("picaditas"), "drumstick",
+		var sauces = new CatalogOptionGroup(1, es("salsa"), 1, 1,
+				List.of(new CatalogOptionItem(1, es("bbq"), false, TODAY), new CatalogOptionItem(2, es("piña"), true, null)));
+		var optionalExtras = new CatalogOptionGroup(2, es("extra"), 0, 1, List.of(new CatalogOptionItem(3, es("queso"), false, TODAY)));
+		var repository = new InMemoryMenu(List.of(new CatalogCategory(1, es("picaditas"), "drumstick",
 				List.of(product(1, false, null, List.of(sauces)), product(2, false, null, List.of(optionalExtras))))), Map.of());
 
 		var products = menuOn(TODAY, repository).categories().getFirst().products();
@@ -97,9 +97,9 @@ class MenuServiceTest {
 
 	@Test
 	void productsWithoutAPriceAreLeftOut() {
-		var unpriced = new Product(2, es("sin precio"), null, false, false, null, null, List.of(), List.of());
+		var unpriced = new CatalogProduct(2, es("sin precio"), null, false, false, null, null, List.of(), List.of());
 		var repository = new InMemoryMenu(
-				List.of(new Category(1, es("bebidas"), "cup-soda", List.of(product(1, false, null, List.of()), unpriced))), Map.of());
+				List.of(new CatalogCategory(1, es("bebidas"), "cup-soda", List.of(product(1, false, null, List.of()), unpriced))), Map.of());
 
 		assertThat(menuOn(TODAY, repository).categories().getFirst().products()).extracting(Menu.Product::id).containsExactly(1L);
 	}

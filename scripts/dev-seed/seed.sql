@@ -5,9 +5,14 @@ set client_min_messages = warning;
 
 begin;
 
-truncate menu_category, lunch_dish, daily_menu, weekly_hours, hours_override, store_status_change restart identity cascade;
+truncate menu_category, lunch_dish, daily_menu, weekly_hours, hours_override, store_status_change, staff_user restart identity cascade;
 
 create function pg_temp.es(text) returns jsonb language sql immutable strict as $$ select jsonb_build_object('es', $1) $$;
+
+insert into staff_user (id, name, role, pin_hash) values
+  (1, 'Encargada', 'admin', '$2a$10$EAarItqPhhKVDRIJ1/bEQ.LiKaKFdvEUGLvTQwk3oorrr4ozT6NLW'),
+  (2, 'Mesero', 'floor', '$2a$10$AkVmktHbbqBvQgtvAfOIseqbOK7hWhXMDTIHR69DpIfd/SnPbdjT.'),
+  (3, 'Cocina', 'kitchen', '$2a$10$njX1yU4.LNqv5IBcqAn0R.iA4Q9rRP/HLyj8nm5t7oWcmMB.Uv1R.');
 
 insert into menu_category (id, name, icon) values
   (1, pg_temp.es('Bolones'), 'egg-fried'),
@@ -171,5 +176,6 @@ select setval(pg_get_serial_sequence('menu_category', 'id'), max(id)) from menu_
 select setval(pg_get_serial_sequence('product', 'id'), max(id)) from product;
 select setval(pg_get_serial_sequence('option_group', 'id'), max(id)) from option_group;
 select setval(pg_get_serial_sequence('lunch_dish', 'id'), max(id)) from lunch_dish;
+select setval(pg_get_serial_sequence('staff_user', 'id'), max(id)) from staff_user;
 
 commit;

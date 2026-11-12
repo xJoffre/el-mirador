@@ -21,6 +21,8 @@ services:
     environment:
       POSTGRES_HOST: db
       SPRINGDOC_API_DOCS_ENABLED: "false"
+    volumes:
+      - photos:/app/photos
     depends_on:
       db:
         condition: service_healthy
@@ -42,5 +44,6 @@ services:
 
 volumes:
   db:
+  photos:
   caddy_data:
   caddy_config:

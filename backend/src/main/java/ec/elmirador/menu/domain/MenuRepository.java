@@ -10,24 +10,24 @@ import jakarta.annotation.Nullable;
 
 public interface MenuRepository {
 
-	List<Category> categories();
+	List<CatalogCategory> categories();
 
 	Optional<DailyMenu> dailyMenu(LocalDate date);
 
-	record Category(long id, Map<String, String> name, String icon, List<Product> products) {
+	record CatalogCategory(long id, Map<String, String> name, String icon, List<CatalogProduct> products) {
 	}
 
-	record Product(long id, Map<String, String> name, @Nullable Map<String, String> description, boolean dineInOnly,
-			boolean hidden, @Nullable LocalDate soldOutOn, @Nullable String photo, List<Variant> variants, List<OptionGroup> optionGroups) {
+	record CatalogProduct(long id, Map<String, String> name, @Nullable Map<String, String> description, boolean dineInOnly,
+			boolean hidden, @Nullable LocalDate soldOutOn, @Nullable String photo, List<Variant> variants, List<CatalogOptionGroup> optionGroups) {
 	}
 
 	record Variant(long id, @Nullable Map<String, String> name, BigDecimal price, String currency) {
 	}
 
-	record OptionGroup(long id, Map<String, String> name, int minChoices, int maxChoices, List<OptionItem> items) {
+	record CatalogOptionGroup(long id, Map<String, String> name, int minChoices, int maxChoices, List<CatalogOptionItem> items) {
 	}
 
-	record OptionItem(long id, Map<String, String> name, boolean hidden, @Nullable LocalDate soldOutOn) {
+	record CatalogOptionItem(long id, Map<String, String> name, boolean hidden, @Nullable LocalDate soldOutOn) {
 	}
 
 	record DailyMenu(LocalDate date, Map<String, String> includes, List<DailyDish> dishes) {

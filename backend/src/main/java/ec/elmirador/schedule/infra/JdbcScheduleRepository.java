@@ -55,4 +55,31 @@ class JdbcScheduleRepository implements ScheduleRepository {
 			.single();
 	}
 
+	@Override
+	public void saveProfile(StoreProfile profile) {
+		jdbc.sql("""
+				update store_profile set name = :name, address = :address, whatsapp = :whatsapp,
+				  bank_account = :bankAccount, delivery_note = :deliveryNote
+				""")
+			.param("name", profile.name())
+			.param("address", profile.address())
+			.param("whatsapp", profile.whatsapp())
+			.param("bankAccount", profile.bankAccount())
+			.param("deliveryNote", profile.deliveryNote())
+			.update();
+	}
+
+	@Override
+	public void saveWeek(Map<Integer, Hours> week) {
+		jdbc.sql("delete from weekly_hours").update();
+		week.forEach((weekday, hours) -> jdbc.sql("insert into weekly_hours (weekday, " + HOURS
+				+ ") values (:weekday, :opensAt, :closesAt, :lunchStartsAt, :lunchEndsAt)")
+			.param("weekday", weekday)
+			.param("opensAt", hours.opensAt())
+			.param("closesAt", hours.closesAt())
+			.param("lunchStartsAt", hours.lunchStartsAt())
+			.param("lunchEndsAt", hours.lunchEndsAt())
+			.update());
+	}
+
 }
