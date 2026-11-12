@@ -1,0 +1,34 @@
+import i18n, { type Resource, type ResourceLanguage } from 'i18next'
+import { initReactI18next } from 'react-i18next'
+import type common from './es/common.json'
+
+const baseLanguage = 'es'
+
+const files = import.meta.glob<{ default: ResourceLanguage[string] }>('./*/*.json', { eager: true })
+
+const resources: Resource = {}
+for (const [path, file] of Object.entries(files)) {
+  const [, language, namespace] = path.match(/^\.\/(.+)\/(.+)\.json$/)!
+  resources[language] = { ...resources[language], [namespace]: file.default }
+}
+
+declare module 'i18next' {
+  interface CustomTypeOptions {
+    defaultNS: 'common'
+    resources: { common: typeof common }
+  }
+}
+
+i18n.on('languageChanged', () => {
+  document.documentElement.lang = i18n.resolvedLanguage ?? baseLanguage
+})
+
+await i18n.use(initReactI18next).init({
+  resources,
+  lng: navigator.language,
+  fallbackLng: baseLanguage,
+  supportedLngs: Object.keys(resources),
+  load: 'languageOnly',
+  defaultNS: 'common',
+  interpolation: { escapeValue: false },
+})
