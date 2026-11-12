@@ -51,6 +51,16 @@ public class CatalogService {
 	}
 
 	@Transactional
+	public void orderCategories(List<Long> ids) {
+		catalog.orderCategories(ids);
+	}
+
+	@Transactional
+	public void orderProducts(long categoryId, List<Long> ids) {
+		catalog.orderProducts(categoryId, ids);
+	}
+
+	@Transactional
 	public long createProduct(ProductForm form) {
 		return catalog.createProduct(form);
 	}

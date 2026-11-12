@@ -23,6 +23,10 @@ public interface CatalogRepository {
 
 	boolean deleteCategory(long id);
 
+	void orderCategories(List<Long> ids);
+
+	void orderProducts(long categoryId, List<Long> ids);
+
 	long createProduct(ProductForm form);
 
 	boolean updateProduct(long id, ProductForm form);
@@ -37,7 +41,7 @@ public interface CatalogRepository {
 
 	boolean markOptionItemSoldOut(long id, @Nullable LocalDate on);
 
-	record CategoryForm(@NotEmpty Map<String, String> name, @NotBlank String icon) {
+	record CategoryForm(@NotEmpty Map<String, String> name, @Nullable Map<String, String> description, @NotBlank String icon) {
 	}
 
 	record ProductForm(long categoryId, @NotEmpty Map<String, String> name, @Nullable Map<String, String> description,
@@ -54,6 +58,9 @@ public interface CatalogRepository {
 	}
 
 	record OptionItemForm(@Nullable Long id, @NotEmpty Map<String, String> name, boolean hidden) {
+	}
+
+	record Order(@NotNull List<Long> ids) {
 	}
 
 	record SoldOut(boolean soldOut) {

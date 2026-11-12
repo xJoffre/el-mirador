@@ -1,15 +1,29 @@
-import { UtensilsCrossed } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+import { MutationCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { createBrowserRouter } from 'react-router'
+import { RouterProvider } from 'react-router/dom'
+import { toast } from 'sonner'
+import { Home } from '@/features/site/Home'
+import { errorText } from '@/shared/lib/format'
+import { Toaster } from '@/shared/ui/sonner'
+
+const queries = new QueryClient({
+  mutationCache: new MutationCache({ onError: (error) => toast.error(errorText(error)) }),
+  defaultOptions: { queries: { retry: false } },
+})
+
+const Nothing = () => null
+
+const router = createBrowserRouter([
+  { path: '/', element: <Home /> },
+  { path: '/ingreso', HydrateFallback: Nothing, lazy: async () => ({ Component: (await import('@/features/auth/SignInPage')).SignInPage }) },
+  { path: '/panel/*', HydrateFallback: Nothing, lazy: async () => ({ Component: (await import('@/features/panel/PanelRoutes')).PanelRoutes }) },
+])
 
 export function App() {
-  const { t } = useTranslation()
   return (
-    <main className="grid min-h-svh place-items-center bg-ground p-4">
-      <section className="grid justify-items-center gap-4 rounded-3xl bg-background p-8 text-center">
-        <UtensilsCrossed className="size-8 text-primary" aria-hidden />
-        <h1 className="font-heading text-6xl font-bold uppercase">{t('brand')}</h1>
-        <p className="text-muted-foreground">{t('comingSoon')}</p>
-      </section>
-    </main>
+    <QueryClientProvider client={queries}>
+      <RouterProvider router={router} />
+      <Toaster position="top-center" />
+    </QueryClientProvider>
   )
 }

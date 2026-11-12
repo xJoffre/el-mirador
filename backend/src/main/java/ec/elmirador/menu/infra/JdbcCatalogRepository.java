@@ -28,19 +28,50 @@ class JdbcCatalogRepository implements CatalogRepository {
 	@Override
 	public long createCategory(CategoryForm form) {
 		return jdbc.sql("""
-				insert into menu_category (name, icon, sort_order)
-				values (cast(:name as jsonb), :icon, (select coalesce(max(sort_order), 0) + 1 from menu_category))
+				insert into menu_category (name, description, icon, sort_order)
+				values (cast(:name as jsonb), cast(:description as jsonb), :icon,
+				  (select coalesce(max(sort_order), 0) + 1 from menu_category))
 				returning id
-				""").param("name", text(form.name())).param("icon", form.icon()).query(Long.class).single();
+				""")
+			.param("name", text(form.name()))
+			.param("description", nullableText(form.description()))
+			.param("icon", form.icon())
+			.query(Long.class)
+			.single();
 	}
 
 	@Override
 	public boolean updateCategory(long id, CategoryForm form) {
-		return jdbc.sql("update menu_category set name = cast(:name as jsonb), icon = :icon where id = :id")
+		return jdbc.sql("""
+				update menu_category set name = cast(:name as jsonb), description = cast(:description as jsonb), icon = :icon
+				where id = :id
+				""")
 			.param("id", id)
 			.param("name", text(form.name()))
+			.param("description", nullableText(form.description()))
 			.param("icon", form.icon())
 			.update() == 1;
+	}
+
+	@Override
+	public void orderCategories(List<Long> ids) {
+		for (var position = 0; position < ids.size(); position++) {
+			jdbc.sql("update menu_category set sort_order = :position where id = :id")
+				.param("id", ids.get(position))
+				.param("position", position)
+				.update();
+		}
+	}
+
+	@Override
+	public void orderProducts(long categoryId, List<Long> ids) {
+		for (var position = 0; position < ids.size(); position++) {
+			jdbc.sql("update product set sort_order = :position where id = :id and menu_category_id = :category")
+				.param("id", ids.get(position))
+				.param("category", categoryId)
+				.param("position", position)
+				.update();
+		}
 	}
 
 	@Override
@@ -107,7 +138,7 @@ class JdbcCatalogRepository implements CatalogRepository {
 		var params = new HashMap<String, Object>();
 		params.put("category", form.categoryId());
 		params.put("name", text(form.name()));
-		params.put("description", form.description() == null ? null : text(form.description()));
+		params.put("description", nullableText(form.description()));
 		params.put("dineInOnly", form.dineInOnly());
 		params.put("hidden", form.hidden());
 		return params;
@@ -123,7 +154,7 @@ class JdbcCatalogRepository implements CatalogRepository {
 			jdbc.sql(sql)
 				.param("id", variant.id())
 				.param("parent", productId)
-				.param("name", variant.name() == null ? null : text(variant.name()))
+				.param("name", nullableText(variant.name()))
 				.param("price", variant.price())
 				.param("position", position)
 				.update();
@@ -184,6 +215,10 @@ class JdbcCatalogRepository implements CatalogRepository {
 
 	private String text(Map<String, String> label) {
 		return json.writeValueAsString(label);
+	}
+
+	private String nullableText(Map<String, String> label) {
+		return label == null ? null : text(label);
 	}
 
 }

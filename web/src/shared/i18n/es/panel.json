@@ -1,0 +1,20 @@
+{
+  "greeting": "Hola, {{name}}",
+  "sections": {
+    "catalog": "Carta",
+    "store": "Local",
+    "users": "Usuarios",
+    "soldOut": "Agotados"
+  },
+  "roles": {
+    "admin": "Encargada",
+    "floor": "Mesero",
+    "kitchen": "Cocina"
+  },
+  "save": "Guardar",
+  "saved": "Guardado",
+  "cancel": "Cancelar",
+  "loading": "Cargando…",
+  "moveUp": "Subir",
+  "moveDown": "Bajar"
+}

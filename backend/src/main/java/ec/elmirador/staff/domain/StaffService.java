@@ -19,7 +19,9 @@ import ec.elmirador.staff.domain.StaffRepository.User;
 @Service
 public class StaffService {
 
-	public static final String PIN = "[0-9]{6}";
+	public static final int PIN_LENGTH = 6;
+
+	public static final String PIN = "[0-9]{" + PIN_LENGTH + "}";
 
 	static final int MAX_FAILED_PINS = 5;
 
@@ -42,7 +44,12 @@ public class StaffService {
 	}
 
 	public List<User> users() {
-		return repository.users();
+		var now = OffsetDateTime.now(clock);
+		return repository.users()
+			.stream()
+			.map(user -> user.lockedUntil() == null || user.lockedUntil().isAfter(now) ? user
+					: new User(user.id(), user.name(), user.role(), user.active(), null))
+			.toList();
 	}
 
 	public Optional<Session> current(long id) {

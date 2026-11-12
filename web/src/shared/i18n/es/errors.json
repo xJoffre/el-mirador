@@ -1,0 +1,22 @@
+{
+  "shared": {
+    "unexpected": "Algo salió mal. Intenta otra vez.",
+    "invalid": "Revisa los datos: hay algo que no está bien escrito.",
+    "duplicate": "Ya existe uno con ese nombre.",
+    "rejected": "No se pudo guardar: algo depende de esto o los datos no cuadran."
+  },
+  "staff": {
+    "wrongPin": "PIN incorrecto.",
+    "locked": "Demasiados intentos. Vuelve a probar a las {{until, datetime(timeStyle: short)}}.",
+    "signInRequired": "Tu sesión terminó. Vuelve a entrar.",
+    "forbidden": "No tienes permiso para esto.",
+    "staleForm": "La página quedó vieja. Vuelve a intentarlo.",
+    "ownAccess": "No puedes quitarte tu propio rol ni desactivarte.",
+    "lastAdmin": "Tiene que quedar al menos una encargada activa.",
+    "notFound": "Esa persona ya no existe."
+  },
+  "menu": {
+    "notFound": "Ese plato o sección ya no existe.",
+    "notAnImage": "El archivo no es una foto."
+  }
+}

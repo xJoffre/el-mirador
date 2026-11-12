@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import ec.elmirador.menu.domain.CatalogRepository.CategoryForm;
+import ec.elmirador.menu.domain.CatalogRepository.Order;
 import ec.elmirador.menu.domain.CatalogRepository.Photo;
 import ec.elmirador.menu.domain.CatalogRepository.ProductForm;
 import ec.elmirador.menu.domain.CatalogRepository.SoldOut;
@@ -50,6 +51,18 @@ class CatalogController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	void updateCategory(@PathVariable long id, @Valid @RequestBody CategoryForm form) {
 		catalog.updateCategory(id, form);
+	}
+
+	@PutMapping("/categories/order")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	void orderCategories(@Valid @RequestBody Order order) {
+		catalog.orderCategories(order.ids());
+	}
+
+	@PutMapping("/categories/{id}/products/order")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	void orderProducts(@PathVariable long id, @Valid @RequestBody Order order) {
+		catalog.orderProducts(id, order.ids());
 	}
 
 	@DeleteMapping("/categories/{id}")

@@ -73,6 +73,8 @@ class PermissionsTest {
 				Arguments.of(HttpMethod.GET, "/api/menu/catalog", admin),
 				Arguments.of(HttpMethod.POST, "/api/menu/categories", admin),
 				Arguments.of(HttpMethod.PUT, "/api/menu/categories/1", admin),
+				Arguments.of(HttpMethod.PUT, "/api/menu/categories/order", admin),
+				Arguments.of(HttpMethod.PUT, "/api/menu/categories/1/products/order", admin),
 				Arguments.of(HttpMethod.DELETE, "/api/menu/categories/1", admin),
 				Arguments.of(HttpMethod.POST, "/api/menu/products", admin),
 				Arguments.of(HttpMethod.PUT, "/api/menu/products/1", admin),

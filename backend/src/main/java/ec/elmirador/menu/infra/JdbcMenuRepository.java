@@ -28,7 +28,7 @@ class JdbcMenuRepository implements MenuRepository {
 		var tree = jdbc.sql("""
 				select coalesce(json_agg(c order by c.sort_order, c.id), '[]')
 				from (
-				  select mc.id, mc.name, mc.icon, mc.sort_order,
+				  select mc.id, mc.name, mc.description, mc.icon, mc.sort_order,
 				    coalesce((
 				      select json_agg(p order by p.sort_order, p.id)
 				      from (

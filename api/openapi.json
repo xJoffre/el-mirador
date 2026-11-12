@@ -75,6 +75,27 @@
         "tags" : [ "catalog-controller" ]
       }
     },
+    "/api/menu/categories/order" : {
+      "put" : {
+        "operationId" : "orderCategories",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Order"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "catalog-controller" ]
+      }
+    },
     "/api/menu/categories/{id}" : {
       "delete" : {
         "operationId" : "deleteCategory",
@@ -110,6 +131,36 @@
             "application/json" : {
               "schema" : {
                 "$ref" : "#/components/schemas/CategoryForm"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "catalog-controller" ]
+      }
+    },
+    "/api/menu/categories/{id}/products/order" : {
+      "put" : {
+        "operationId" : "orderProducts",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Order"
               }
             }
           },
@@ -540,6 +591,12 @@
       "CatalogCategory" : {
         "type" : "object",
         "properties" : {
+          "description" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
           "icon" : {
             "type" : "string"
           },
@@ -560,7 +617,7 @@
             }
           }
         },
-        "required" : [ "icon", "id", "name", "products" ]
+        "required" : [ "description", "icon", "id", "name", "products" ]
       },
       "CatalogOptionGroup" : {
         "type" : "object",
@@ -665,6 +722,12 @@
       "Category" : {
         "type" : "object",
         "properties" : {
+          "description" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
           "icon" : {
             "type" : "string"
           },
@@ -685,11 +748,17 @@
             }
           }
         },
-        "required" : [ "icon", "id", "name", "products" ]
+        "required" : [ "description", "icon", "id", "name", "products" ]
       },
       "CategoryForm" : {
         "type" : "object",
         "properties" : {
+          "description" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
           "icon" : {
             "type" : "string",
             "minLength" : 1
@@ -702,7 +771,7 @@
             "minProperties" : 1
           }
         },
-        "required" : [ "icon", "name" ]
+        "required" : [ "description", "icon", "name" ]
       },
       "DailyDish" : {
         "type" : "object",
@@ -804,6 +873,8 @@
           },
           "pin" : {
             "type" : "string",
+            "maxLength" : 6,
+            "minLength" : 6,
             "pattern" : "[0-9]{6}"
           },
           "role" : {
@@ -915,6 +986,19 @@
           }
         },
         "required" : [ "hidden", "id", "name" ]
+      },
+      "Order" : {
+        "type" : "object",
+        "properties" : {
+          "ids" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            }
+          }
+        },
+        "required" : [ "ids" ]
       },
       "Photo" : {
         "type" : "object",
@@ -1066,6 +1150,8 @@
         "properties" : {
           "pin" : {
             "type" : "string",
+            "maxLength" : 6,
+            "minLength" : 6,
             "pattern" : "[0-9]{6}"
           },
           "staff_id" : {
@@ -1164,6 +1250,8 @@
           },
           "pin" : {
             "type" : [ "string", "null" ],
+            "maxLength" : 6,
+            "minLength" : 6,
             "pattern" : "[0-9]{6}"
           },
           "role" : {

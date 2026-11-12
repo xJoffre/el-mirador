@@ -10,7 +10,8 @@ import ec.elmirador.menu.domain.MenuRepository.Variant;
 
 public record Menu(List<Category> categories, @Nullable Map<String, String> lunchIncludes, List<DailyDish> lunch) {
 
-	public record Category(long id, Map<String, String> name, String icon, List<Product> products) {
+	public record Category(long id, Map<String, String> name, @Nullable Map<String, String> description, String icon,
+			List<Product> products) {
 	}
 
 	public record Product(long id, Map<String, String> name, @Nullable Map<String, String> description, boolean dineInOnly,

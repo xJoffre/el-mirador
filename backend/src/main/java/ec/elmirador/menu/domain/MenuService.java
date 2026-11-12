@@ -24,7 +24,7 @@ public class MenuService {
 		var today = LocalDate.now(clock);
 		var categories = repository.categories()
 			.stream()
-			.map(category -> new Menu.Category(category.id(), category.name(), category.icon(),
+			.map(category -> new Menu.Category(category.id(), category.name(), category.description(), category.icon(),
 					category.products()
 						.stream()
 						.filter(product -> !product.hidden() && !product.variants().isEmpty())

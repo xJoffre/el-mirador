@@ -8,6 +8,7 @@ import * as zod from 'zod';
 
 export const GetMenuResponse = zod.object({
   "categories": zod.array(zod.object({
+  "description": zod.record(zod.string(), zod.string()).nullable(),
   "icon": zod.string(),
   "id": zod.int(),
   "name": zod.record(zod.string(), zod.string()),
@@ -51,6 +52,7 @@ export const GetMenuResponse = zod.object({
 
 
 export const GetCatalogResponseItem = zod.object({
+  "description": zod.record(zod.string(), zod.string()).nullable(),
   "icon": zod.string(),
   "id": zod.int(),
   "name": zod.record(zod.string(), zod.string()),
@@ -89,6 +91,7 @@ export const GetCatalogResponse = zod.array(GetCatalogResponseItem)
 
 
 export const CreateCategoryBody = zod.object({
+  "description": zod.record(zod.string(), zod.string()).nullable(),
   "icon": zod.string().min(1),
   "name": zod.record(zod.string(), zod.string())
 })
@@ -96,6 +99,13 @@ export const CreateCategoryBody = zod.object({
 export const CreateCategoryResponse = zod.object({
   "id": zod.int()
 })
+
+
+export const OrderCategoriesBody = zod.object({
+  "ids": zod.array(zod.int())
+})
+
+export const OrderCategoriesResponse = zod.void()
 
 
 export const DeleteCategoryParams = zod.object({
@@ -113,11 +123,23 @@ export const UpdateCategoryParams = zod.object({
 
 
 export const UpdateCategoryBody = zod.object({
+  "description": zod.record(zod.string(), zod.string()).nullable(),
   "icon": zod.string().min(1),
   "name": zod.record(zod.string(), zod.string())
 })
 
 export const UpdateCategoryResponse = zod.void()
+
+
+export const OrderProductsParams = zod.object({
+  "id": zod.int()
+})
+
+export const OrderProductsBody = zod.object({
+  "ids": zod.array(zod.int())
+})
+
+export const OrderProductsResponse = zod.void()
 
 
 export const MarkOptionItemSoldOutParams = zod.object({
@@ -323,11 +345,15 @@ export const GetSessionResponse = zod.object({
 })
 
 
+export const signInBodyPinMin = 6;
+export const signInBodyPinMax = 6;
+
+
 export const signInBodyPinRegExp = new RegExp('[0-9]{6}');
 
 
 export const SignInBody = zod.object({
-  "pin": zod.string().regex(signInBodyPinRegExp),
+  "pin": zod.string().min(signInBodyPinMin).max(signInBodyPinMax).regex(signInBodyPinRegExp),
   "staff_id": zod.int()
 })
 
@@ -349,12 +375,16 @@ export const GetUsersResponse = zod.array(GetUsersResponseItem)
 
 
 
+export const createUserBodyPinMin = 6;
+export const createUserBodyPinMax = 6;
+
+
 export const createUserBodyPinRegExp = new RegExp('[0-9]{6}');
 
 
 export const CreateUserBody = zod.object({
   "name": zod.string().min(1),
-  "pin": zod.string().regex(createUserBodyPinRegExp),
+  "pin": zod.string().min(createUserBodyPinMin).max(createUserBodyPinMax).regex(createUserBodyPinRegExp),
   "role": zod.enum(['admin', 'floor', 'kitchen'])
 })
 
@@ -368,13 +398,17 @@ export const UpdateUserParams = zod.object({
 })
 
 
+export const updateUserBodyPinMin = 6;
+export const updateUserBodyPinMax = 6;
+
+
 export const updateUserBodyPinRegExp = new RegExp('[0-9]{6}');
 
 
 export const UpdateUserBody = zod.object({
   "active": zod.boolean(),
   "name": zod.string().min(1),
-  "pin": zod.string().regex(updateUserBodyPinRegExp).nullable(),
+  "pin": zod.string().min(updateUserBodyPinMin).max(updateUserBodyPinMax).regex(updateUserBodyPinRegExp).nullable(),
   "role": zod.enum(['admin', 'floor', 'kitchen'])
 })
 

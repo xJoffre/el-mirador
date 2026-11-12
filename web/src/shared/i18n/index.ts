@@ -1,8 +1,15 @@
 import i18n, { type Resource, type ResourceLanguage } from 'i18next'
 import { initReactI18next } from 'react-i18next'
+import type auth from './es/auth.json'
+import type catalog from './es/catalog.json'
 import type common from './es/common.json'
+import type errors from './es/errors.json'
+import type panel from './es/panel.json'
+import type soldOut from './es/soldOut.json'
+import type store from './es/store.json'
+import type users from './es/users.json'
 
-const baseLanguage = 'es'
+export const baseLanguage = 'es'
 
 const files = import.meta.glob<{ default: ResourceLanguage[string] }>('./*/*.json', { eager: true })
 
@@ -15,7 +22,16 @@ for (const [path, file] of Object.entries(files)) {
 declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: 'common'
-    resources: { common: typeof common }
+    resources: {
+      auth: typeof auth
+      catalog: typeof catalog
+      common: typeof common
+      errors: typeof errors
+      panel: typeof panel
+      soldOut: typeof soldOut
+      store: typeof store
+      users: typeof users
+    }
   }
 }
 
@@ -32,3 +48,5 @@ await i18n.use(initReactI18next).init({
   defaultNS: 'common',
   interpolation: { escapeValue: false },
 })
+
+export default i18n

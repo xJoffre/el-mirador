@@ -10,6 +10,7 @@
   --font-heading: "Antonio Variable", "Arial Narrow", sans-serif;
   --font-sans: "Onest Variable", system-ui, sans-serif;
   --color-ground: var(--ground);
+  --color-brand: var(--brand);
   --color-success: var(--success);
   --color-ring: var(--ring);
   --color-input: var(--input);
@@ -40,6 +41,7 @@
 
 :root {
   --ground: #3a160d;
+  --brand: #f4510b;
   --success: #2f6b3c;
   --background: #fff9e9;
   --foreground: #2a140d;
@@ -47,7 +49,7 @@
   --card-foreground: #2a140d;
   --popover: #fff9e9;
   --popover-foreground: #2a140d;
-  --primary: #f4510b;
+  --primary: #cc4400;
   --primary-foreground: #fff9e9;
   --secondary: #f7ebd2;
   --secondary-foreground: #2a140d;
@@ -57,7 +59,7 @@
   --accent-foreground: #c23f00;
   --destructive: #a8231a;
   --border: #efdcb9;
-  --input: #efdcb9;
+  --input: #9c7a52;
   --ring: #f4510b;
   --radius: 0.625rem;
 }

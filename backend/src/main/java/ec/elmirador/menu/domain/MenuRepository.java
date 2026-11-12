@@ -14,7 +14,8 @@ public interface MenuRepository {
 
 	Optional<DailyMenu> dailyMenu(LocalDate date);
 
-	record CatalogCategory(long id, Map<String, String> name, String icon, List<CatalogProduct> products) {
+	record CatalogCategory(long id, Map<String, String> name, @Nullable Map<String, String> description, String icon,
+			List<CatalogProduct> products) {
 	}
 
 	record CatalogProduct(long id, Map<String, String> name, @Nullable Map<String, String> description, boolean dineInOnly,

@@ -1,0 +1,14 @@
+{
+  "title": "Quién usa el sistema",
+  "hint": "Cada persona entra con su propio PIN, así cada pedido, cobro y cancelación queda a su nombre.",
+  "name": "Nombre",
+  "role": "Rol",
+  "active": "Activo",
+  "newPin": "PIN nuevo",
+  "newPinHint": "Sin cambiar",
+  "you": "{{name}} (tú)",
+  "lockedUntil": "Bloqueado hasta las {{until, datetime(timeStyle: short)}}",
+  "add": "Agregar persona",
+  "pin": "PIN de 6 números",
+  "roles": "Mesero: salón, pedidos y agotados. Cocina: su pantalla y agotados. Encargada: todo, incluida la carta, la caja y los usuarios."
+}
