@@ -1,0 +1,25 @@
+{
+  "status": "Estado del local",
+  "now": "Ahora: {{status}}",
+  "statuses": {
+    "open": "Abierto",
+    "delayed": "Con demora",
+    "closed": "No se atiende"
+  },
+  "wait_one": "Espera de {{count}} minuto",
+  "wait_other": "Espera de {{count}} minutos",
+  "untilTime": "hasta las {{until, datetime(timeStyle: short)}}",
+  "waitMinutes": "Minutos de espera",
+  "reason": "Motivo que ve el cliente",
+  "until": "Hasta (opcional)",
+  "untilHint": "A esa hora vuelve solo al horario normal.",
+  "apply": "Aplicar",
+  "hoursToday": "Horario de hoy",
+  "hoursTodayHint": "Cambia solo el día de hoy. Mañana vuelve el horario de cada semana.",
+  "saveToday": "Guardar solo por hoy",
+  "keepUsual": "Volver al horario normal",
+  "opens": "Abre",
+  "closes": "Cierra",
+  "lunchFrom": "Almuerzo desde",
+  "lunchTo": "Hasta"
+}

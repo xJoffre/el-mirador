@@ -1,6 +1,8 @@
 {
   "greeting": "Hola, {{name}}",
   "sections": {
+    "today": "Hoy",
+    "lunch": "Almuerzo",
     "catalog": "Carta",
     "store": "Local",
     "users": "Usuarios",

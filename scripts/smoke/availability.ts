@@ -12,6 +12,7 @@ const schedule = async () => GetScheduleResponse.parse(await (await fetch(`${bas
 const product = async (id: number) => (await menu()).categories.flatMap((category) => category.products).find((p) => p.id === id)
 
 const wings = Number(sql(`select id from product where name ->> 'es' = 'Alitas'`))
+const manager = Number(sql(`select min(id) from staff_user where role = 'admin'`))
 
 try {
   sql(`update product set hidden = true where id = ${wings}`)
@@ -30,15 +31,15 @@ try {
   const withoutLunch = await menu()
   assert.deepEqual([withoutLunch.lunch, withoutLunch.lunch_includes], [[], null], 'an unpublished lunch is not served')
 
-  sql(`insert into hours_override (override_date, opens_at, closes_at, lunch_starts_at, lunch_ends_at)
-       values (${today}, '00:00', '23:59', '00:00', '23:59')`)
-  sql(`insert into store_status_change (status, wait_minutes, reason, until_at)
-       values ('delayed', 30, 'Local lleno', now() + interval '1 hour')`)
+  sql(`insert into hours_override (override_date, opens_at, closes_at, lunch_starts_at, lunch_ends_at, created_by)
+       values (${today}, '00:00', '23:59', '00:00', '23:59', ${manager})`)
+  sql(`insert into store_status_change (status, wait_minutes, reason, until_at, created_by)
+       values ('delayed', 30, 'Local lleno', now() + interval '1 hour', ${manager})`)
   const delayed = await schedule()
   assert.deepEqual([delayed.status.status, delayed.status.wait_minutes, delayed.status.reason], ['delayed', 30, 'Local lleno'], 'a delay set by the staff is shown')
   assert.equal(delayed.lunch_now, true, 'the lunch hours of the change for today apply')
 
-  sql(`insert into store_status_change (status, until_at) values ('closed', now() - interval '1 minute')`)
+  sql(`insert into store_status_change (status, until_at, created_by) values ('closed', now() - interval '1 minute', ${manager})`)
   assert.equal((await schedule()).status.status, 'open', 'an expired status no longer applies')
 
   sql(`update hours_override set closes_at = '00:01' where override_date = ${today}`)

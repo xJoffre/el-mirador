@@ -1,0 +1,22 @@
+{
+  "date": "Día",
+  "publish": "Publicar almuerzo",
+  "unpublish": "Quitar el almuerzo",
+  "unpublishConfirm": "¿Quitar el almuerzo de ese día?",
+  "includes": "Bebida y postre del día",
+  "includesHint": "Por ejemplo: jugo de naranjilla y gelatina",
+  "inMenu": "En el menú",
+  "priceAlone": "Precio solo",
+  "priceFull": "Almuerzo completo",
+  "published": "Publicado",
+  "notPublished": "Ese día todavía no tiene almuerzo publicado.",
+  "dishes": "Platos del almuerzo",
+  "dishesHint": "Las sopas y segundos que suelen hacer. Ocultar uno lo saca de la lista para publicar.",
+  "soups": "Sopas",
+  "mains": "Segundos",
+  "newDish": "Nuevo plato",
+  "add": "Agregar",
+  "hidden": "Oculto",
+  "name": "Nombre",
+  "kind": "Tipo"
+}

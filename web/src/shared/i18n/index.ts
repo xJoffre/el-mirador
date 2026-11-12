@@ -4,9 +4,12 @@ import type auth from './es/auth.json'
 import type catalog from './es/catalog.json'
 import type common from './es/common.json'
 import type errors from './es/errors.json'
+import type lunch from './es/lunch.json'
 import type panel from './es/panel.json'
+import type site from './es/site.json'
 import type soldOut from './es/soldOut.json'
 import type store from './es/store.json'
+import type today from './es/today.json'
 import type users from './es/users.json'
 
 export const baseLanguage = 'es'
@@ -27,9 +30,12 @@ declare module 'i18next' {
       catalog: typeof catalog
       common: typeof common
       errors: typeof errors
+      lunch: typeof lunch
       panel: typeof panel
+      site: typeof site
       soldOut: typeof soldOut
       store: typeof store
+      today: typeof today
       users: typeof users
     }
   }

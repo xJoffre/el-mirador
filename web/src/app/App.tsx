@@ -2,9 +2,10 @@ import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@ta
 import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
 import { toast } from 'sonner'
-import { Home } from '@/features/site/Home'
+import { SitePage } from '@/features/site/SitePage'
 import { getGetSessionQueryKey } from '@/shared/api/client'
 import { errorText } from '@/shared/lib/format'
+import { LiveUpdates } from '@/shared/lib/live'
 import { ApiError } from '@/shared/lib/request'
 import { Toaster } from '@/shared/ui/sonner'
 
@@ -25,7 +26,7 @@ const queries: QueryClient = new QueryClient({
 const Nothing = () => null
 
 const router = createBrowserRouter([
-  { path: '/', element: <Home /> },
+  { path: '/', element: <SitePage /> },
   { path: '/ingreso', HydrateFallback: Nothing, lazy: async () => ({ Component: (await import('@/features/auth/SignInPage')).SignInPage }) },
   { path: '/panel/*', HydrateFallback: Nothing, lazy: async () => ({ Component: (await import('@/features/panel/PanelRoutes')).PanelRoutes }) },
 ])
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
 export function App() {
   return (
     <QueryClientProvider client={queries}>
+      <LiveUpdates />
       <RouterProvider router={router} />
       <Toaster position="top-center" />
     </QueryClientProvider>

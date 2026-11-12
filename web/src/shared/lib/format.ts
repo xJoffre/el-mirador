@@ -22,3 +22,13 @@ export function errorText(error: unknown) {
   )
   return i18n.t(code as 'shared.unexpected', { ns: 'errors', ...values })
 }
+
+const MONDAY = new Date(2024, 0, 1)
+
+export const weekdayName = (isoDay: number) =>
+  new Intl.DateTimeFormat(i18n.resolvedLanguage, { weekday: 'long' }).format(
+    new Date(MONDAY.getFullYear(), MONDAY.getMonth(), MONDAY.getDate() + isoDay - 1),
+  )
+
+export const clock = (time: string | null | undefined) =>
+  time ? new Intl.DateTimeFormat(undefined, { timeStyle: 'short' }).format(new Date(`1970-01-01T${time}`)) : ''

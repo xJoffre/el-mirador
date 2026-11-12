@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { getGetMenuQueryKey, useGetMenu, useMarkOptionItemSoldOut, useMarkProductSoldOut } from '@/shared/api/client'
+import { getGetMenuQueryKey, useGetMenu, useGetSchedule, useMarkLunchDishSoldOut, useMarkOptionItemSoldOut, useMarkProductSoldOut } from '@/shared/api/client'
 import { useLabel } from '@/shared/lib/format'
 import { Label } from '@/shared/ui/label'
 import { Switch } from '@/shared/ui/switch'
@@ -13,10 +13,32 @@ export function SoldOutPage() {
   const refresh = { mutation: { onSuccess: () => queries.invalidateQueries({ queryKey: getGetMenuQueryKey() }) } }
   const markProduct = useMarkProductSoldOut(refresh)
   const markItem = useMarkOptionItemSoldOut(refresh)
+  const markLunch = useMarkLunchDishSoldOut(refresh)
+  const schedule = useGetSchedule()
 
   return (
     <div className="grid gap-6">
       <p className="text-muted-foreground">{t('hint')}</p>
+      {schedule.data && menu.data && menu.data.lunch.length > 0 && (
+        <section className="grid gap-2">
+          <h2 className="font-heading text-2xl font-bold uppercase">{t('lunch')}</h2>
+          <ul className="grid gap-2 md:grid-cols-2">
+            {menu.data.lunch.map((dish) => (
+              <li key={dish.id} className="flex items-center justify-between gap-4 rounded-xl bg-card p-3">
+                <Label htmlFor={`lunch-${dish.id}`} className="text-base">
+                  {label(dish.name)}
+                </Label>
+                <Switch
+                  id={`lunch-${dish.id}`}
+                  checked={dish.sold_out}
+                  onCheckedChange={(soldOut) => markLunch.mutate({ date: schedule.data.date, id: dish.id, data: { sold_out: soldOut } })}
+                  aria-label={t('soldOut')}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       {menu.data?.categories.map((category) => (
         <section key={category.id} className="grid gap-2">
           <h2 className="font-heading text-2xl font-bold uppercase">{label(category.name)}</h2>

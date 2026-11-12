@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint --deny-warnings",
     "api": "curl -sf http://localhost:8080/v3/api-docs -o ../api/openapi.json && orval",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -40,6 +41,7 @@
     "orval": "^8.47.0",
     "oxlint": "^1.90.0",
     "typescript": "~7.0.2",
-    "vite": "^8.3.6"
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0"
   }
 }
