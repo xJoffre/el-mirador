@@ -63,6 +63,9 @@ jobs:
       - name: dev seed
         run: psql -q -f scripts/dev-seed/seed.sql
 
+      - name: the database rejects invalid data
+        run: psql -q -f scripts/smoke/constraints.sql
+
       - name: start
         working-directory: backend
         run: |
@@ -80,6 +83,7 @@ jobs:
         run: |
           node scripts/smoke/base.ts http://localhost:8080
           node scripts/smoke/menu.ts http://localhost:8080
+          node scripts/smoke/availability.ts http://localhost:8080
 
   docker:
     runs-on: ubuntu-latest

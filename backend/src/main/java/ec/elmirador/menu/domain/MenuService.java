@@ -25,7 +25,11 @@ public class MenuService {
 		var categories = repository.categories()
 			.stream()
 			.map(category -> new Menu.Category(category.id(), category.name(), category.icon(),
-					category.products().stream().filter(product -> !product.hidden()).map(product -> product(product, today)).toList()))
+					category.products()
+						.stream()
+						.filter(product -> !product.hidden() && !product.variants().isEmpty())
+						.map(product -> product(product, today))
+						.toList()))
 			.filter(category -> !category.products().isEmpty())
 			.toList();
 		var lunch = repository.dailyMenu(today);
@@ -43,8 +47,10 @@ public class MenuService {
 						.map(item -> new Menu.OptionItem(item.id(), item.name(), today.equals(item.soldOutOn())))
 						.toList()))
 			.toList();
-		return new Menu.Product(product.id(), product.name(), product.description(), product.dineInOnly(),
-				today.equals(product.soldOutOn()), product.photo(), product.variants(), optionGroups);
+		var soldOut = today.equals(product.soldOutOn()) || optionGroups.stream()
+			.anyMatch(group -> group.items().stream().filter(item -> !item.soldOut()).count() < group.minChoices());
+		return new Menu.Product(product.id(), product.name(), product.description(), product.dineInOnly(), soldOut,
+				product.photo(), product.variants(), optionGroups);
 	}
 
 }

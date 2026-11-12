@@ -82,6 +82,29 @@ class MenuServiceTest {
 	}
 
 	@Test
+	void aRequiredChoiceWithNothingLeftSellsOutTheProduct() {
+		var sauces = new OptionGroup(1, es("salsa"), 1, 1,
+				List.of(new OptionItem(1, es("bbq"), false, TODAY), new OptionItem(2, es("piña"), true, null)));
+		var optionalExtras = new OptionGroup(2, es("extra"), 0, 1, List.of(new OptionItem(3, es("queso"), false, TODAY)));
+		var repository = new InMemoryMenu(List.of(new Category(1, es("picaditas"), "drumstick",
+				List.of(product(1, false, null, List.of(sauces)), product(2, false, null, List.of(optionalExtras))))), Map.of());
+
+		var products = menuOn(TODAY, repository).categories().getFirst().products();
+
+		assertThat(products).extracting(Menu.Product::soldOut).containsExactly(true, false);
+		assertThat(menuOn(TODAY.plusDays(1), repository).categories().getFirst().products().getFirst().soldOut()).isFalse();
+	}
+
+	@Test
+	void productsWithoutAPriceAreLeftOut() {
+		var unpriced = new Product(2, es("sin precio"), null, false, false, null, null, List.of(), List.of());
+		var repository = new InMemoryMenu(
+				List.of(new Category(1, es("bebidas"), "cup-soda", List.of(product(1, false, null, List.of()), unpriced))), Map.of());
+
+		assertThat(menuOn(TODAY, repository).categories().getFirst().products()).extracting(Menu.Product::id).containsExactly(1L);
+	}
+
+	@Test
 	void lunchIsTheOnePublishedForToday() {
 		var soup = new DailyDish(1, DishKind.soup, es("locro"), null, new BigDecimal("1.50"), "USD", false);
 		var repository = new InMemoryMenu(List.of(), Map.of(TODAY, new DailyMenu(TODAY, es("jugo y gelatina"), List.of(soup))));
