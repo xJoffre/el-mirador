@@ -66,7 +66,6 @@
   "send": "Enviar pedido · {{total}}",
   "storeClosedNow": "Ahora no estamos recibiendo pedidos.",
   "fixOrder": "Quita del pedido lo que ya no está disponible.",
-  "yourOrders": "Tus pedidos",
   "orderNumber": "Pedido #{{id}}",
   "states": {
     "received": "Recibido",

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router'
 import type { Schedule } from '@/shared/api/client'
 import { clock, weekdayName } from '@/shared/lib/format'
 import { cn } from '@/shared/lib/utils'
@@ -7,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui/di
 const WEEK = [1, 2, 3, 4, 5, 6, 7]
 
 export function StoreInfoDialog({ schedule, onClose }: { schedule: Schedule; onClose: () => void }) {
-  const { t } = useTranslation('site')
+  const { t } = useTranslation(['site', 'privacy'])
   const { profile, week } = schedule
   const todayIndex = (new Date(`${schedule.date}T12:00`).getDay() + 6) % 7 + 1
 
@@ -61,7 +62,12 @@ export function StoreInfoDialog({ schedule, onClose }: { schedule: Schedule; onC
           {fact(t('transfers'), profile.bank_account)}
           {fact(t('delivery'), profile.delivery_note)}
         </dl>
-        <p className="text-xs text-muted-foreground">{t('photoCredit')}</p>
+        <p className="text-xs text-muted-foreground">
+          {`${t('photoCredit')} `}
+          <Link className="underline" to="/privacidad">
+            {t('privacy:title')}
+          </Link>
+        </p>
       </DialogContent>
     </Dialog>
   )

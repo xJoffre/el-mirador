@@ -24,7 +24,7 @@ test('a customer orders on the web, the kitchen marks it ready and the tracking 
   await page.getByRole('button', { name: 'Enviar pedido' }).click()
 
   await page.getByLabel('Tu nombre').fill('Cliente E2E')
-  await page.getByLabel('Tu WhatsApp').fill('593999999999')
+  await page.getByLabel('Tu WhatsApp').fill(`5939${String(Date.now()).slice(-8)}`)
   await page.getByRole('button', { name: /^Enviar pedido · / }).click()
 
   await expect(page).toHaveURL(/\/pedido\//)

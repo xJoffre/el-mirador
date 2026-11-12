@@ -34,6 +34,8 @@ public class OrderService {
 
 	public static final Changed CHANGED = new Changed("orders");
 
+	static final int MAX_OPEN_ORDERS_PER_PHONE = 3;
+
 	private static final SecureRandom RANDOM = new SecureRandom();
 
 	private final OrderRepository orders;
@@ -53,6 +55,9 @@ public class OrderService {
 
 	@Transactional
 	public Placed place(NewOrder order) {
+		if (orders.openOrders(order.customerPhone()) >= MAX_OPEN_ORDERS_PER_PHONE) {
+			throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "orders.tooMany");
+		}
 		var schedule = offer.schedule();
 		if (schedule.status().status() == StoreStatus.closed) {
 			throw rejected("orders.storeClosed");

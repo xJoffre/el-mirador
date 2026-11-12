@@ -6,8 +6,9 @@ Pedidos en línea para El Mirador, bar-restaurante de Zaruma: la carta y el almu
 
 - **Menú web**: la carta y el almuerzo del día, con lo que está disponible en este momento.
 - **Panel**: cada persona entra con su nombre y PIN y ve lo que su rol permite; carta con fotos, horario y estado del local, usuarios, agotados del día, pedidos, caja y datos de factura para el contador.
-- **Cocina**: la fila única de comandas, que se actualiza sola (SSE) y suena al llegar una nueva.
+- **Cocina**: la fila única de comandas, que se actualiza sola (SSE), suena al llegar una nueva y deja la pantalla de la tablet siempre encendida.
 - **Seguimiento**: el cliente ve su pedido pasar de recibido a listo sin recargar la página.
+- **Instalable**: el sitio y el panel se instalan como app en el celular o la tablet. El aviso de privacidad está en `/privacidad`.
 
 ## Cómo correrlo
 
@@ -17,7 +18,7 @@ Requisitos: Java 25, Node 24 y PostgreSQL 18.
 2. Backend: `cd backend && ./mvnw spring-boot:run` (aplica las migraciones al arrancar).
 3. Datos de prueba con la carta real: `psql -h localhost -U el_mirador -d el_mirador -f scripts/dev-seed/seed.sql` (equipo de prueba: Encargada `123456`, Mesero `222222`, Cocina `333333`).
 4. Web: `cd web && npm install && npm run dev` => http://localhost:5173 (las rutas `/api` van al backend).
-5. Pruebas de humo: `node scripts/smoke/base.ts` y `node scripts/smoke/menu.ts` (esta última con las variables `PG*` de psql).
+5. Pruebas de humo: `node scripts/smoke/<nombre>.ts` (las que tocan la base usan las variables `PG*` de psql) y de punta a punta: `cd web && npm run e2e`.
 
 ## Producción
 

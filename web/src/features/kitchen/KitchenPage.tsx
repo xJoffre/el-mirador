@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getGetKitchenQueryKey, useFinishRound, useGetKitchen, useStartRound } from '@/shared/api/client'
 import { useLineText } from '@/shared/lib/lines'
+import { SAFETY_REFRESH } from '@/shared/lib/live'
 import { minutesSince, useNow } from '@/shared/lib/now'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/button'
@@ -23,7 +24,7 @@ function beep(audio: AudioContext) {
 
 export function KitchenPage() {
   const { t } = useTranslation(['kitchen', 'orders'])
-  const tickets = useGetKitchen()
+  const tickets = useGetKitchen(SAFETY_REFRESH)
   const lineText = useLineText()
   const now = useNow()
   const queries = useQueryClient()
@@ -32,6 +33,23 @@ export function KitchenPage() {
   const finish = useFinishRound(refresh)
   const [audio, setAudio] = useState<AudioContext>()
   const seen = useRef<Set<number>>(undefined)
+
+  useEffect(() => {
+    let lock: WakeLockSentinel | undefined
+    let leaving = false
+    const keepAwake = async () => {
+      if (document.visibilityState !== 'visible') return
+      lock = await navigator.wakeLock?.request('screen').catch(() => undefined)
+      if (leaving) lock?.release()
+    }
+    keepAwake()
+    document.addEventListener('visibilitychange', keepAwake)
+    return () => {
+      leaving = true
+      document.removeEventListener('visibilitychange', keepAwake)
+      lock?.release()
+    }
+  }, [])
 
   useEffect(() => {
     if (!tickets.data) return
@@ -72,10 +90,10 @@ export function KitchenPage() {
             </ul>
             {ticket.note && <p className="italic">{t('note', { note: ticket.note })}</p>}
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="secondary" size="lg" disabled={!!ticket.started_at || start.isPending} onClick={() => start.mutate({ id: ticket.round_id })}>
+              <Button variant="secondary" size="lg" className="h-12 text-base" disabled={!!ticket.started_at || start.isPending} onClick={() => start.mutate({ id: ticket.round_id })}>
                 {ticket.started_at ? t('started') : t('start')}
               </Button>
-              <Button size="lg" disabled={finish.isPending} onClick={() => finish.mutate({ id: ticket.round_id })}>
+              <Button size="lg" className="h-12 text-base" disabled={finish.isPending} onClick={() => finish.mutate({ id: ticket.round_id })}>
                 {t('ready')}
               </Button>
             </div>

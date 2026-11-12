@@ -1,4 +1,9 @@
 {
   "brand": "El Mirador",
-  "close": "Cerrar"
+  "close": "Cerrar",
+  "offline": "Sin conexión con El Mirador. Reintentando…",
+  "notFound": "Esta página no existe.",
+  "crashed": "Algo salió mal. Recarga la página; si sigue pasando, avísanos.",
+  "reload": "Recargar",
+  "serverError": "El sistema no respondió bien. Intenta de nuevo en un momento."
 }

@@ -19,7 +19,7 @@ import { Textarea } from '@/shared/ui/textarea'
 type Props = { lines: ResolvedLine[]; total: number; currency: string; onClose: () => void }
 
 export function CheckoutDialog({ lines, total, currency, onClose }: Props) {
-  const { t } = useTranslation('site')
+  const { t } = useTranslation(['site', 'privacy'])
   const cart = useCart()
   const navigate = useNavigate()
   const [delivery, setDelivery] = useState(false)
@@ -160,6 +160,12 @@ export function CheckoutDialog({ lines, total, currency, onClose }: Props) {
           </div>
           <p className="min-h-5 text-sm text-destructive" role="alert">
             {error}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {`${t('privacy:checkoutNote')} `}
+            <a className="underline" href="/privacidad" target="_blank" rel="noreferrer">
+              {t('privacy:title')}
+            </a>
           </p>
           <Button type="submit" size="lg" disabled={place.isPending}>
             {t('send', { total: money(total, currency) })}

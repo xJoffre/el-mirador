@@ -60,6 +60,14 @@ class JdbcOrderRepository implements OrderRepository {
 	}
 
 	@Override
+	public int openOrders(String customerPhone) {
+		return jdbc.sql("select count(*) from customer_order where customer_phone = :phone and status = 'open'")
+			.param("phone", customerPhone)
+			.query(Integer.class)
+			.single();
+	}
+
+	@Override
 	public Placed place(NewOrder order, LocalDate menuDate, String trackingToken) {
 		var id = jdbc.sql("""
 				insert into customer_order (tracking_token, kind, delivery_address, channel, customer_name, customer_phone, note)

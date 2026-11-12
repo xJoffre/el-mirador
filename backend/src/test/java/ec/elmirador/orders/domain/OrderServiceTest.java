@@ -73,6 +73,11 @@ class OrderServiceTest {
 		Totals totals = new Totals("open", new BigDecimal("12.50"), BigDecimal.ZERO, "USD");
 
 		@Override
+		public int openOrders(String customerPhone) {
+			return (int) placed.stream().filter(order -> order.customerPhone().equals(customerPhone)).count();
+		}
+
+		@Override
 		public Placed place(NewOrder order, LocalDate menuDate, String trackingToken) {
 			placed.add(order);
 			return new Placed(placed.size(), trackingToken, BigDecimal.ONE, "USD");
@@ -186,6 +191,17 @@ class OrderServiceTest {
 		assertThat(outcome(open, order(lunch(LineKind.lunch_full, 8L, 7L)))).isEqualTo("orders.unavailable");
 		assertThat(outcome(open, order(lunch(LineKind.lunch_soup, 7L, 8L)))).isEqualTo("orders.unavailable");
 		assertThat(orders.placed).isEmpty();
+	}
+
+	@Test
+	void onePhoneCannotKeepMoreThanThreeOrdersOpen() {
+		var open = service(StoreStatus.open, true);
+		for (int count = 0; count < OrderService.MAX_OPEN_ORDERS_PER_PHONE; count++) {
+			assertThat(outcome(open, order(product(10)))).isEqualTo("placed");
+		}
+
+		assertThat(outcome(open, order(product(10)))).isEqualTo("orders.tooMany");
+		assertThat(outcome(open, new NewOrder("Luis", "593988888888", null, null, List.of(product(10)), null))).isEqualTo("placed");
 	}
 
 	@Test

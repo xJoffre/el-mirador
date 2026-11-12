@@ -72,6 +72,10 @@ try {
   const again = await waiter('POST', `/api/orders/${id}/close`, { payments: [{ method: 'cash', amount: 1 }] })
   assert.equal(again.body.code, 'orders.notOpen', 'a closed order cannot be charged again')
 
+  const crowd = { ...order, customer_phone: '593900000001', lines: [order.lines[0]] }
+  for (let count = 0; count < 3; count++) assert.equal((await customer('POST', '/api/orders', crowd)).status, 200, 'a customer can keep three orders open')
+  assert.equal((await customer('POST', '/api/orders', crowd)).body.code, 'orders.tooMany', 'one phone cannot flood the kitchen with a fourth open order')
+
   const today: { id: number }[] = (await waiter('GET', '/api/orders/today')).body
   assert.ok(today.some((candidate) => candidate.id === id), 'the order is in the list of today')
   GetScheduleResponse.parse((await customer('GET', '/api/schedule')).body)

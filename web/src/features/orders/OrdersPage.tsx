@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { getGetTodayOrdersQueryKey, SessionRole, useCancelOrder, useCloseOrder, useGetSession, useGetTodayOrders, type OrderView } from '@/shared/api/client'
 import { money } from '@/shared/lib/format'
 import { useLineText } from '@/shared/lib/lines'
+import { SAFETY_REFRESH } from '@/shared/lib/live'
 import { minutesSince, useNow } from '@/shared/lib/now'
 import { cn } from '@/shared/lib/utils'
 import { useSaved } from '@/features/panel/useSaved'
@@ -22,7 +23,7 @@ const COLUMNS = [
 
 export function OrdersPage() {
   const { t } = useTranslation('orders')
-  const orders = useGetTodayOrders()
+  const orders = useGetTodayOrders(SAFETY_REFRESH)
   const session = useGetSession()
   const [charging, setCharging] = useState<OrderView>()
   const [cancelling, setCancelling] = useState<OrderView>()

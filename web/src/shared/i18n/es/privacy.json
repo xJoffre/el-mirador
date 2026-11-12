@@ -1,0 +1,32 @@
+{
+  "title": "Aviso de privacidad",
+  "intro": "{{name}} usa tus datos solo para atender tu pedido.",
+  "sections": {
+    "data": {
+      "title": "Qué datos guardamos",
+      "text": "Tu nombre, tu número de WhatsApp, la dirección si pides a domicilio y la nota del pedido. Si pides factura, también tu cédula, RUC o pasaporte, el nombre de la factura, tu correo y tu dirección."
+    },
+    "purpose": {
+      "title": "Para qué",
+      "text": "Para preparar y entregar tu pedido, escribirte por WhatsApp si hace falta y emitir tu factura. No los usamos para publicidad ni los vendemos."
+    },
+    "sharing": {
+      "title": "Con quién los compartimos",
+      "text": "Con el servicio de entrega, tu nombre, tu número y tu dirección, solo si pides a domicilio. Con nuestro contador, los datos de la factura."
+    },
+    "retention": {
+      "title": "Cuánto tiempo",
+      "text": "Los pedidos y las facturas se guardan el tiempo que exige la normativa tributaria del Ecuador."
+    },
+    "rights": {
+      "title": "Tus derechos",
+      "text": "Según la Ley Orgánica de Protección de Datos Personales, puedes pedirnos ver, corregir o eliminar tus datos."
+    },
+    "device": {
+      "title": "En tu teléfono",
+      "text": "Este sitio no usa cookies de publicidad ni de seguimiento. Tu pedido en curso se guarda solo en tu teléfono."
+    }
+  },
+  "contact": "Escríbenos por WhatsApp:",
+  "checkoutNote": "Usamos tus datos solo para tu pedido."
+}

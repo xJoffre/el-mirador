@@ -15,7 +15,7 @@ import zaruma from '@/features/site/zaruma.jpg'
 import { useGetMenu, useGetSchedule, type Menu, type Product, type Schedule } from '@/shared/api/client'
 import { money, useLabel } from '@/shared/lib/format'
 import { cn } from '@/shared/lib/utils'
-import { Button } from '@/shared/ui/button'
+import { Button, buttonVariants } from '@/shared/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/shared/ui/dialog'
 import { Input } from '@/shared/ui/input'
 
@@ -88,7 +88,7 @@ function Site({ menu, schedule }: { menu: Menu; schedule: Schedule }) {
       <div className="mx-auto max-w-7xl overflow-hidden bg-background md:rounded-3xl">
         <header className="flex items-center gap-4 p-4">
           <h1 className="font-heading leading-none font-bold uppercase text-brand">
-            <span className="block text-lg">{schedule.profile.name.split(' ').slice(0, -1).join(' ')}</span>
+            <span className="block text-xl">{schedule.profile.name.split(' ').slice(0, -1).join(' ')}</span>
             <span className="block text-5xl">{schedule.profile.name.split(' ').at(-1)}</span>
           </h1>
           <div className="hidden min-w-0 sm:block">
@@ -96,11 +96,11 @@ function Site({ menu, schedule }: { menu: Menu; schedule: Schedule }) {
             {schedule.profile.address && <p className="text-sm text-muted-foreground">{schedule.profile.address}</p>}
           </div>
           {latest && (
-            <Button variant="secondary" className="ml-auto" render={<Link to={`/pedido/${latest.tracking_token}`} />} nativeButton={false}>
+            <Link className={buttonVariants({ variant: 'secondary', className: 'ml-auto' })} to={`/pedido/${latest.tracking_token}`}>
               {t('orderNumber', { id: latest.id })}
-            </Button>
+            </Link>
           )}
-          <Button variant="secondary" className={latest ? undefined : 'ml-auto'} onClick={() => setInfo(true)}>
+          <Button variant="secondary" className={latest ? undefined : 'ml-auto'} aria-label={t('info')} onClick={() => setInfo(true)}>
             <Info aria-hidden />
             <span className="hidden sm:inline">{t('info')}</span>
           </Button>

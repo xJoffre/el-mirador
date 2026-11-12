@@ -15,7 +15,7 @@ import {
   type InvoiceRequest,
 } from '@/shared/api/client'
 import { money } from '@/shared/lib/format'
-import { Button } from '@/shared/ui/button'
+import { Button, buttonVariants } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
 
@@ -33,10 +33,10 @@ export function CashPage() {
           <Label htmlFor="cash-day">{t('day')}</Label>
           <Input id="cash-day" type="date" value={day} onChange={(event) => setChosen(event.target.value || undefined)} />
         </div>
-        <Button render={<a href={getGetSalesCsvUrl({ from: day, to: day })} download />} nativeButton={false}>
+        <a className={buttonVariants()} href={getGetSalesCsvUrl({ from: day, to: day })} download>
           <Download aria-hidden />
           {t('download')}
-        </Button>
+        </a>
       </div>
       <Summary day={day} />
       <div className="grid items-start gap-6 xl:grid-cols-2">

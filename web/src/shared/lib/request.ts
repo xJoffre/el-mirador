@@ -23,7 +23,7 @@ export async function request<T>(url: string, options: RequestInit): Promise<T> 
     headers: { ...options.headers, 'X-XSRF-TOKEN': csrfToken() },
   })
   const text = await response.text()
-  const body = text ? JSON.parse(text) : undefined
+  const body = text && response.headers.get('content-type')?.includes('json') ? JSON.parse(text) : undefined
   if (!response.ok) {
     const code = body?.code ?? (response.status === 400 ? 'shared.invalid' : 'shared.unexpected')
     throw new ApiError(response.status, code, body ?? {})

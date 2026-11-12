@@ -24,6 +24,8 @@ public interface OrderRepository {
 
 	Placed place(NewOrder order, LocalDate menuDate, String trackingToken);
 
+	int openOrders(String customerPhone);
+
 	Optional<OrderView> track(String trackingToken);
 
 	List<OrderView> since(OffsetDateTime since);

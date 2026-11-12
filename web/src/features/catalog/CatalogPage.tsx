@@ -172,7 +172,7 @@ function Section({ category }: { category: CatalogCategory }) {
             >
               <ArrowDown aria-hidden />
             </Button>
-            <Button variant="secondary" onClick={() => setEditing(product)}>
+            <Button variant="secondary" aria-label={t('edit')} onClick={() => setEditing(product)}>
               <Pencil aria-hidden />
               <span className="hidden sm:inline">{t('edit')}</span>
             </Button>

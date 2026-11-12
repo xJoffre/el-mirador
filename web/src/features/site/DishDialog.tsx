@@ -66,7 +66,7 @@ export function DishDialog({ product, onClose }: { product: Product; onClose: ()
               <span className={cn('text-sm', missing.includes(group) ? 'text-accent-foreground' : 'text-muted-foreground')}>{rule(group)}</span>
             </legend>
             {group.items.map((item) => (
-              <label key={item.id} className={cn('flex items-center gap-3 rounded-lg bg-card p-3', item.sold_out ? 'opacity-60' : 'cursor-pointer has-checked:ring-2 has-checked:ring-primary')}>
+              <label key={item.id} className={cn('flex items-center gap-3 rounded-lg bg-card p-3', item.sold_out ? 'text-muted-foreground' : 'cursor-pointer has-checked:ring-2 has-checked:ring-primary')}>
                 <input
                   type={group.max_choices === 1 ? 'radio' : 'checkbox'}
                   name={`group-${group.id}`}

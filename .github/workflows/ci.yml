@@ -46,6 +46,9 @@ jobs:
           npm test
           npm run build
 
+      - name: every error code has its text
+        run: node scripts/error-codes.ts
+
       - name: backend
         working-directory: backend
         run: sh mvnw -B verify

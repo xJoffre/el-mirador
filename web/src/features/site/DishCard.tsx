@@ -22,7 +22,7 @@ type Props = {
 export function DishCard({ name, description, details, price, photo, icon, unavailable, quantity = 0, onAdd, onRemove }: Props) {
   const { t } = useTranslation('site')
   return (
-    <article className={cn('flex gap-3 rounded-xl bg-card p-3', unavailable && 'opacity-70')}>
+    <article className="flex gap-3 rounded-xl bg-card p-3">
       <div className="grid min-w-0 flex-1 content-start gap-1">
         <h3 className="font-medium">{name}</h3>
         {description && <p className="line-clamp-2 text-sm text-muted-foreground">{description}</p>}
@@ -30,7 +30,7 @@ export function DishCard({ name, description, details, price, photo, icon, unava
         {unavailable && <p className="text-sm font-medium text-accent-foreground">{unavailable}</p>}
         <p className="mt-auto pt-2 font-semibold">{price}</p>
       </div>
-      <div className="relative size-28 shrink-0">
+      <div className={cn('relative size-28 shrink-0', unavailable && 'opacity-60 grayscale')}>
         {photo ? (
           <img src={photo} alt="" loading="lazy" className="size-full rounded-lg object-cover" />
         ) : (

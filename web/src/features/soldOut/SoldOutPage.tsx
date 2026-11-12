@@ -57,7 +57,7 @@ export function SoldOutPage() {
                   />
                 </div>
                 {product.option_groups.flatMap((group) => group.items).map((item) => (
-                  <div key={item.id} className="flex items-center justify-between gap-4 pl-4 text-sm">
+                  <div key={item.id} className="flex items-center justify-between gap-4 py-1 pl-4 text-sm">
                     <Label htmlFor={`item-${item.id}`}>{label(item.name)}</Label>
                     <Switch
                       id={`item-${item.id}`}

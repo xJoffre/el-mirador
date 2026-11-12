@@ -9,6 +9,7 @@ import type kitchen from './es/kitchen.json'
 import type lunch from './es/lunch.json'
 import type orders from './es/orders.json'
 import type panel from './es/panel.json'
+import type privacy from './es/privacy.json'
 import type site from './es/site.json'
 import type soldOut from './es/soldOut.json'
 import type store from './es/store.json'
@@ -38,6 +39,7 @@ declare module 'i18next' {
       lunch: typeof lunch
       orders: typeof orders
       panel: typeof panel
+      privacy: typeof privacy
       site: typeof site
       soldOut: typeof soldOut
       store: typeof store

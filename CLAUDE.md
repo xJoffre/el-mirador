@@ -9,6 +9,7 @@ Sistema de pedidos del bar-restaurante El Mirador (Zaruma, Ecuador). La arquitec
 - `api/openapi.json`: el contrato exportado por el backend. Su diff es la revisión de cada cambio de la API.
 - `scripts/smoke/`: pruebas de humo contra el sistema real (`node scripts/smoke/<nombre>.ts <url>`). `menu.ts` valida las respuestas con los esquemas zod generados y compara los conteos con la base vía `psql` (usa `PGHOST`, `PGDATABASE`, `PGUSER` y `PGPASSWORD`). `availability.ts` cambia datos en la base, revisa que la API los refleje y al final restaura con el seeder. `live.ts` escucha `/api/events` y exige que cada cambio llegue como aviso. `orders.ts` recorre un pedido completo y comprueba que el precio y el total los pone la base. `invoicing.ts` prueba la caja: cancelar, cobrar por transferencia, confirmarla, anotar la factura y el CSV del contador. `comments.sql` falla si una tabla o columna no tiene comentario, y `constraints.sql`, si la base acepta datos inválidos.
 - `scripts/dev-seed/seed.sql`: la carta real y datos de prueba, solo para desarrollo. Se puede correr de nuevo: vacía y vuelve a llenar (`psql -f scripts/dev-seed/seed.sql`).
+- `scripts/error-codes.ts`: falla si un código de error que lanza el backend no tiene su texto en `errors.json` (corre en la CI).
 - `scripts/new-migration.ts`: el generador de migraciones (`node scripts/new-migration.ts <nombre-en-kebab>`). Nunca se nombra un archivo de migración a mano.
 - `deploy/`: `Dockerfile`, `docker-compose.yml` (PostgreSQL, app, Caddy) y `Caddyfile`.
 
@@ -24,6 +25,7 @@ Usuarios del seeder de desarrollo: Encargada `123456`, Mesero `222222`, Cocina `
 - Sesión de Spring en memoria (14 h), cookie `SameSite=Lax` y `Secure` detrás de Caddy (`forward-headers-strategy=native`). CSRF con `csrf.spa()`: la web manda `X-XSRF-TOKEN` desde `src/shared/lib/request.ts`.
 - Los permisos por ruta están en un solo lugar: `staff/api/SecurityConfiguration`. Lo que no está listado es solo para la encargada. Una ruta nueva suma su fila en `PermissionsTest`, que prueba cada ruta con cada rol.
 - `StaffSessionFilter` relee al usuario en cada pedido: desactivarlo o cambiarle el rol corta su sesión abierta al instante.
+- Un mismo teléfono puede tener a lo sumo 3 pedidos abiertos (`OrderService.MAX_OPEN_ORDERS_PER_PHONE`, `orders.tooMany`): frena el spam sin bloquear a quien comparte la IP del operador. Las pruebas usan un teléfono distinto por corrida.
 
 ## Ciclo del contrato
 
@@ -48,7 +50,12 @@ Con el backend corriendo: `cd web && npm run api` (exporta `api/openapi.json` y 
 - Los errores de negocio son `new ApiException(status, "modulo.clave")`: el estado HTTP real y una clave i18n en `code`. La web la traduce con `errorText()` desde `src/shared/i18n/es/errors.json`; los valores extra del error (por ejemplo `until`) se interpolan.
 - Los módulos no se importan entre sí: se hablan por contratos publicados y eventos. Para avisar al navegador, el servicio publica `Menu.CHANGED` o `Schedule.CHANGED` con `ApplicationEventPublisher`; `EventStream` lo reenvía por SSE después del commit, y `src/shared/lib/live.ts` refresca las consultas de ese tema (`menu` o `schedule`). Quién hizo un cambio llega al controlador con `@AuthenticationPrincipal(expression = "id()") long staffId`, sin importar el módulo `staff`.
 - Las horas se guardan como `timestamptz`; "hoy" se calcula con el `Clock` inyectado (America/Guayaquil), y la sesión de PostgreSQL usa la misma zona.
-- Web: la prueba de punta a punta (`web/e2e`, Playwright) pide en la web, marca listo en la cocina y espera que el seguimiento cambie solo. Se corre con el sistema arriba: `npm run e2e`.
+- Web: las pruebas de punta a punta (`web/e2e`, Playwright) piden en la web, marcan listo en la cocina y esperan que el seguimiento cambie solo; también vigilan que el panel sin sesión mande a `/ingreso` sin insistir y la página 404. Se corren con el sistema arriba: `npm run e2e`.
+- Web: conexión. `useLiveUpdates` (`src/shared/lib/live.ts`) reabre el SSE si el navegador lo da por cerrado (un 502 durante un reinicio), muestra el aviso de sin conexión y al volver refresca todo. Cocina, pedidos y seguimiento además se recargan cada 30 s (`SAFETY_REFRESH`), por si la conexión muere en silencio.
+- Web: errores. Las consultas reintentan solo fallas de red y 502 a 504. Un 401 invalida la sesión, salvo que venga de la propia consulta de sesión (eso armó un bucle de cientos de pedidos por segundo en la semana 7). Una ruta desconocida o un fallo al dibujar van a `src/app/RouteError.tsx`.
+- Web: PWA sin service worker. Hay dos manifiestos en `web/public`: el del sitio y el del panel; `PanelRoutes` cambia el enlace al del panel, así la tablet instala el panel. La cocina pide la pantalla siempre encendida (Wake Lock).
+- Web: un enlace con forma de botón es `<a>` o `Link` con `buttonVariants()`. `Button render={<Link />}` le pone `role="button"` y el lector de pantalla lo anuncia como botón.
+- Web: el aviso de privacidad (`/privacidad`, textos en `privacy.json`) lo debe revisar el dueño del local antes de salir.
 - Web: el carrito del sitio (`features/site/cart.ts`) guarda solo ids y cantidades; nombres, precios y disponibilidad se calculan siempre con la carta actual. Sus reglas tienen pruebas con Vitest (`npm test`).
 - Web: los datos del servidor se leen con los hooks que genera orval (TanStack Query) y los formularios validan con los esquemas zod generados (`zodResolver`). Un error de mutación se muestra solo como aviso (`MutationCache`). El naranja de marca (`brand`, #F4510B) es para títulos grandes; los botones usan `primary` (#CC4400), que da 4,5:1 con el texto crema.
 - Web: ningún texto, color ni tamaño escrito a mano; textos con `t()`, colores y tamaños con los tokens de `theme.css`. Íconos de `lucide-react` (`menu_category.icon` guarda el nombre en kebab-case para `DynamicIcon`). Nada de `console.*` (lo bloquea el lint).

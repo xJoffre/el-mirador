@@ -5,31 +5,32 @@ import { Link, useParams } from 'react-router'
 import { OrderViewState, useGetSchedule, useGetTracking } from '@/shared/api/client'
 import { money } from '@/shared/lib/format'
 import { useLineText } from '@/shared/lib/lines'
+import { SAFETY_REFRESH } from '@/shared/lib/live'
+import { ApiError } from '@/shared/lib/request'
 import { cn } from '@/shared/lib/utils'
-import { Button } from '@/shared/ui/button'
+import { Notice } from '@/features/site/Notice'
+import { buttonVariants } from '@/shared/ui/button'
 
 const STEPS: OrderViewState[] = [OrderViewState.received, OrderViewState.preparing, OrderViewState.ready, OrderViewState.delivered]
 
 export function TrackingPage() {
   const { t } = useTranslation('site')
   const { token = '' } = useParams()
-  const order = useGetTracking(token)
+  const order = useGetTracking(token, SAFETY_REFRESH)
   const schedule = useGetSchedule()
   const lineText = useLineText()
   useEffect(() => {
     if (order.data) document.title = t('orderNumber', { id: order.data.id })
   }, [order.data, t])
 
-  if (order.isError) {
+  if (order.error instanceof ApiError && order.error.status === 404) {
     return (
-      <main className="grid min-h-svh place-items-center bg-ground p-4">
-        <section className="grid justify-items-center gap-4 rounded-3xl bg-background p-8 text-center">
-          <p>{t('orderNotFound')}</p>
-          <Button render={<Link to="/" />} nativeButton={false}>
-            {t('backToMenu')}
-          </Button>
-        </section>
-      </main>
+      <Notice>
+        <p>{t('orderNotFound')}</p>
+        <Link className={buttonVariants()} to="/">
+          {t('backToMenu')}
+        </Link>
+      </Notice>
     )
   }
   if (!order.data) return <div className="min-h-svh bg-ground" />
@@ -98,13 +99,13 @@ export function TrackingPage() {
         )}
 
         <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" render={<Link to="/" />} nativeButton={false}>
+          <Link className={buttonVariants({ variant: 'secondary' })} to="/">
             {t('backToMenu')}
-          </Button>
+          </Link>
           {profile?.whatsapp && (
-            <Button render={<a href={`https://wa.me/${profile.whatsapp}`} target="_blank" rel="noreferrer" />} nativeButton={false}>
+            <a className={buttonVariants()} href={`https://wa.me/${profile.whatsapp}`} target="_blank" rel="noreferrer">
               {t('writeUs')}
-            </Button>
+            </a>
           )}
         </div>
       </section>
